@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "434060467469",
+    "firebase_url": "https://takeme-2019.firebaseio.com",
+    "project_id": "takeme-2019",
+    "storage_bucket": "takeme-2019.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434060467469:android:76ec37f02cabe28c",
+        "android_client_info": {
+          "package_name": "com.takeme.takemeto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "434060467469-nv82d1jbk54lialg6sg9t9dn46ffhet4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takeme.takemeto",
+            "certificate_hash": "b46f5ca5866f1e8772d37aa5cb5cebce4a37d07a"
+          }
+        },
+        {
+          "client_id": "434060467469-fp57pvalg169blkbuoqeft9t1b5j3s8l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUGAxx1LWmSZ5oq5dk3EZnHRlP5_TwSek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "434060467469-fp57pvalg169blkbuoqeft9t1b5j3s8l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-1696018568424604~9355875062"
+    }
+  ],
+  "configuration_version": "1"
+}

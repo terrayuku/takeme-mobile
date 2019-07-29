@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Take Me</string>
+    <string name="action_settings">About</string>
+    <string name="from">From</string>
+    <string name="destination">To</string>
+    <string name="sign">Sign</string>
+    <string name="got_it">Got It</string>
+    <string name="add_sign">Add Sign</string>
+    <string name="upload_sign">Upload Sign</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1696018568424604~9355875062</string>
+    <string name="banner_ad_unit_id_test">ca-app-pub-3940256099942544/6300978111</string>
+</resources>
