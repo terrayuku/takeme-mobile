@@ -17,7 +17,7 @@ android:
 
 
 before_install:
-  - yes | $HOME/android-sdk/tools/bin/sdkmanager "platforms;android-29"
+  - yes | /usr/local/android-sdk/tools/bin/sdkmanager "platforms;android-29"
 
 script:
   - ./run.sh
