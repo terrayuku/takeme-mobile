@@ -17,7 +17,7 @@ android:
 
 
 before_install:
-  - yes | sdkmanager "platforms;android-29"
+  - yes | $HOME/android-sdk/tools/bin/sdkmanager "platforms;android-29"
 
 script:
-  - ./gradlew assembleDebug
+  - ./run.sh
