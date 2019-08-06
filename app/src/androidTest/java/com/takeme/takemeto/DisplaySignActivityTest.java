@@ -32,7 +32,7 @@ public class DisplaySignActivityTest {
     @Rule
     public IntentsTestRule<DisplaySignActivity> intentsTestRule = new IntentsTestRule<>(DisplaySignActivity.class);
 
-    // overriding the set text in view function in view action to allow TextView
+    // overriding the set text in view function in view action destination allow TextView
     public static ViewAction setTextInTextView(final String value) {
         return new ViewAction() {
             @Override

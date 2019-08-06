@@ -17,7 +17,11 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1696018568424604~9355875062" />
 
-        <activity  android:label="Add Sign With Directions"
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/maps_key" />
+
+        <activity  android:label="Add Sign"
         android:name=".AddSignForDirections"
             android:foregroundServiceType="location">
 
