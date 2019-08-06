@@ -1,12 +1,25 @@
 <resources>
     <string name="app_name">Take Me</string>
     <string name="action_settings">About</string>
+
     <string name="from">From</string>
     <string name="destination">To</string>
     <string name="sign">Sign</string>
     <string name="got_it">Got It</string>
     <string name="add_sign">Add Sign</string>
     <string name="upload_sign">Upload Sign</string>
+
     <string name="banner_ad_unit_id">ca-app-pub-1696018568424604~9355875062</string>
     <string name="banner_ad_unit_id_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="noValidDirections">Please enter valid direction</string>
+    <string name="noImageCaptured">Please make sure you take a photo of the hand sign to use</string>
+    <string name="uploadPrefix">Upload is </string>
+    <string name="uploadSurfix">% done</string>
+    <string name="uploadPaused">Upload is paused</string>
+    <string name="uploadFailed">Uploading Sign Failed</string>
+    <string name="uploadSuccess">Thank you for uploading the sign, we appreciate your support</string>
+    <string name="genericFailure">Thank you for using Take Me, unfortunately we could not finalize everything right now</string>
+    <string name="signFound">Thank you for using Take Me, travel safe to your destination, hope to see you soon</string>
+    <string name="signNotFound">Thank you for using Take Me, unfortunately we do not have those directions in our records</string>
+    <string name="signWithNoImage">Thank you for using Take Me, unfortunately the directions you are looking for we do not have the sign for them</string>
 </resources>

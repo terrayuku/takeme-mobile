@@ -9,39 +9,53 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.takeme.takemeto.impl.Location;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.takeme.takemeto.MESSAGE";
     public static final String FROM = "com.takeme.takemeto.FROM";
     public static final String DESTINATION = "com.takeme.takemeto.DESTINATION";
     TextView thankyou;
-    EditText from;
-    EditText destination;
     FloatingActionButton findDirections;
     private AdView mAdView;
+    Location location;
+
+    Place from;
+    Place destination;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        location = new Location();
+
         loadAdView();
 
-        from = (EditText)findViewById(R.id.from);
-        destination = (EditText)findViewById(R.id.destination);
         findDirections = (FloatingActionButton) findViewById(R.id.findDirections);
-
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,6 +73,65 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(addSingIntent);
             }
         });
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
+        }
+//        PlacesClient placesClient = Places.createClient(this);
+
+        // Initialize the AutocompleteSupportFragment.
+        AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.from);
+        AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.destination);
+
+        if (fromFragment != null) {
+            fromFragment.setHint("From...");
+            fromFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+
+            // Setting Bounds
+            fromFragment.setLocationBias(RectangularBounds.newInstance(
+                    new LatLng(-34.277857,18.2359139),
+                    new LatLng(-23.9116035,29.380895)));
+
+            // Set up a PlaceSelectionListener destination handle the response.
+            fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    // TODO: Get info about the selected place.
+                    Log.i("ADD", "Place: " + place.getName() + ", " + place.getId());
+                    from = place;
+                }
+
+                @Override
+                public void onError(@NonNull Status status) {
+
+                }
+            });
+        }
+
+        if (toFragment != null) {
+            toFragment.setHint("To...");
+            toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+
+            toFragment.setLocationBias(RectangularBounds.newInstance(
+                    new LatLng(-34.277857,18.2359139),
+                    new LatLng(-23.9116035,29.380895)));
+
+            toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    // TODO: Get info about the selected place.
+                    Log.i("ADD", "Place: " + place.getName() + ", " + place.getId());
+                    destination = place;
+                }
+
+                @Override
+                public void onError(@NonNull Status status) {
+
+                }
+            });
+        }
     }
 
     private void loadAdView() {
@@ -113,15 +186,19 @@ public class MainActivity extends AppCompatActivity {
                         Spannable.SPAN_INCLUSIVE_INCLUSIVE
                 );
 
+            } else {
+                error();
             }
 
             thankyou.setText(spannableStringBuilder);
+        } else {
+            error();
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu; this adds items destination the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -139,23 +216,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void findSingButton(View view) {
         Intent findSignIntent = new Intent(this, DisplaySignActivity.class);
-        // disable direction sign button
-        if(from.getText().toString().isEmpty() & destination.getText().toString().isEmpty()) {
-            SpannableStringBuilder spannableStringBuilder =  new SpannableStringBuilder("Please enter valid directions");
+
+        if(from == null && destination == null) {
+            SpannableStringBuilder spannableStringBuilder =  new SpannableStringBuilder(getResources().getString(R.string.noValidDirections));
             spannableStringBuilder.setSpan(
                     new ForegroundColorSpan(Color.RED),
                     0,
-                    "Please enter valid directions".length(),
+                    getResources().getString(R.string.noValidDirections).length(),
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE
             );
             thankyou.setText(spannableStringBuilder);
         } else {
-            String message = "From " + from.getText().toString() + " To " + destination.getText().toString();
+            String message = "From " + from.getName() + " To " + destination.getName();
+
             findSignIntent.putExtra(EXTRA_MESSAGE, message);
-            findSignIntent.putExtra(DESTINATION, destination.getText().toString());
-            findSignIntent.putExtra(FROM, from.getText().toString());
+            findSignIntent.putExtra(DESTINATION, destination.getName());
+            findSignIntent.putExtra(FROM, from.getName());
             startActivity(findSignIntent);
         }
 
+    }
+
+    private void error() {
+        thankyou.setText(getResources().getString(R.string.genericFailure));
     }
 }

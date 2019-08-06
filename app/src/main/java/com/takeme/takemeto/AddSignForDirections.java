@@ -12,15 +12,16 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import android.util.Log;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,9 +30,16 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -42,7 +50,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.takeme.takemeto.model.LatLon;
+import com.takeme.takemeto.impl.Location;
 import com.takeme.takemeto.model.Sign;
 
 public class AddSignForDirections extends AppCompatActivity {
@@ -56,6 +64,7 @@ public class AddSignForDirections extends AppCompatActivity {
     ImageView newImageView;
     TextView message;
     private AdView mAdView;
+    Location location;
 
     private StorageReference reference;
     private StorageMetadata metadata;
@@ -63,6 +72,10 @@ public class AddSignForDirections extends AppCompatActivity {
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
+
+    Place from;
+    Place destination;
+    ProgressBar simpleProgressBar;
 
 
     @Override
@@ -72,6 +85,9 @@ public class AddSignForDirections extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loadAdView();
+        location = new Location();
+
+        simpleProgressBar = (ProgressBar) findViewById(R.id.simpleProgressBar);
 
         newImageView = (ImageView) findViewById(R.id.newImage);
         message = (TextView) findViewById(R.id.message);
@@ -80,6 +96,55 @@ public class AddSignForDirections extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mAuth.signOut();
         signInAnonymously();
+
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
+        }
+
+        AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.from);
+        AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.to);
+
+        if (fromFragment != null) {
+            fromFragment.setHint("From...");
+            fromFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+            fromFragment.setLocationBias(RectangularBounds.newInstance(
+                    new LatLng(-34.277857,18.2359139),
+                    new LatLng(-23.9116035,29.380895)));
+
+            fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    from = place;
+                }
+
+                @Override
+                public void onError(@NonNull Status status) {
+
+                }
+            });
+        }
+
+        if (toFragment != null) {
+            toFragment.setHint("To...");
+            toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+            toFragment.setLocationBias(RectangularBounds.newInstance(
+                    new LatLng(-34.277857,18.2359139),
+                    new LatLng(-23.9116035,29.380895)));
+
+            toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    destination = place;
+                }
+
+                @Override
+                public void onError(@NonNull Status status) {
+
+                }
+            });
+        }
     }
 
     @Override
@@ -109,22 +174,27 @@ public class AddSignForDirections extends AppCompatActivity {
     }
 
     public void addSign(View view) {
-        uploadFile(currentPhotoPath);
+        if(destination != null && from != null && newImageView != null) {
+            if(currentPhotoPath != null && !currentPhotoPath.isEmpty()) {
+                uploadFile(currentPhotoPath);
+            } else {
+                noImageCaptured();
+            }
+        } else {
+            invalidValues();
+        }
     }
 
     // take the file saved when taking the picture
     public void uploadFile(String newSignPath) {
 
         final Uri file = Uri.fromFile(new File(newSignPath));
-        final Sign sign = new Sign();
-        // Save the cordinates with the download url on db
-        final EditText from = (EditText) findViewById(R.id.from);
-        final EditText destination = (EditText) findViewById(R.id.destination);
+//         Save the coordinates with the download url on db
 
         metadata = new StorageMetadata.Builder()
                 .setContentType("image/jpeg")
-                .setCustomMetadata("from", from.getText().toString())
-                .setCustomMetadata("destination", destination.getText().toString())
+                .setCustomMetadata("from", from.getName())
+                .setCustomMetadata("destination", destination.getName())
                 .build();
 
         Log.i("Reference", reference.getName());
@@ -134,34 +204,31 @@ public class AddSignForDirections extends AppCompatActivity {
             @Override
             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                 double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                message.setText("Upload is " + Math.round(progress) + "% done");
+                message.setText(getResources().getString(R.string.uploadPrefix) + " " + Math.round(progress) + " " + getResources().getString(R.string.uploadSurfix));
+
+                simpleProgressBar.setVisibility(View.VISIBLE);
+
             }
         }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-                message.setText("Upload is paused");
+                message.setText(getResources().getString(R.string.uploadPaused));
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                message.setText("Uploading Sign Failed");
+                message.setText(getResources().getString(R.string.uploadFailed));
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                sign.setDestination(destination.getText().toString());
-                sign.setFrom(from.getText().toString());
+                final Sign sign = new Sign(destination, from);
 
                 if (mAuth.getCurrentUser().isAnonymous()) {
 
                     database = FirebaseDatabase.getInstance();
                     databaseReference = database.getReference("signs");
-
-                    // set lat lon location
-                    final LatLon latLon = new LatLon(26.2548777698755, 27.3698);
-                    sign.setLatLon(latLon);
                     // download url
                     Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
@@ -169,7 +236,7 @@ public class AddSignForDirections extends AppCompatActivity {
 
                             sign.setDownloadUrl(uri.toString());
 
-                            databaseReference.child(sign.getDestination()).push().setValue(sign).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            databaseReference.child(sign.getDestination().getName().toUpperCase()).push().setValue(sign).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     success();
@@ -208,21 +275,27 @@ public class AddSignForDirections extends AppCompatActivity {
 
     private void success() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = "Thank you for uploading the sign, much appreciated";
-        intent.putExtra(THANKYOU, message);
+        intent.putExtra(THANKYOU, getResources().getString(R.string.uploadSuccess));
         startActivity(intent);
     }
 
     private void error() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = "Thank you for trying to upload the sign, unfortunately we could not finalize everything.";
-        intent.putExtra(THANKYOU, message);
+        intent.putExtra(THANKYOU, getResources().getString(R.string.genericFailure));
         startActivity(intent);
+    }
+
+    private void invalidValues() {
+        message.setText(getResources().getString(R.string.noValidDirections));
+    }
+
+    private void noImageCaptured() {
+        message.setText(getResources().getString(R.string.noImageCaptured));
     }
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
+        // Ensure that there's a camera activity destination handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
@@ -239,7 +312,11 @@ public class AddSignForDirections extends AppCompatActivity {
                 Log.i("PhotoUri", photoURI.getPath());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            } else {
+                error();
             }
+        } else {
+            error();
         }
     }
 
@@ -247,7 +324,6 @@ public class AddSignForDirections extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-
             Glide.with(this).load(currentPhotoPath).into(newImageView);
         }
     }
@@ -265,8 +341,12 @@ public class AddSignForDirections extends AppCompatActivity {
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        currentPhotoPath = image.getAbsolutePath();
-        currentPhotoName = image.getName();
+        if(!image.getAbsolutePath().isEmpty()) {
+            currentPhotoPath = image.getAbsolutePath();
+            currentPhotoName = image.getName();
+        } else {
+            noImageCaptured();
+        }
         return image;
     }
 
@@ -290,10 +370,10 @@ public class AddSignForDirections extends AppCompatActivity {
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
-        // Determine how much to scale down the image
+        // Determine how much destination scale down the image
         int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
 
-        // Decode the image file into a Bitmap sized to fill the View
+        // Decode the image file into a Bitmap sized destination fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;

@@ -1,45 +1,39 @@
 package com.takeme.takemeto.model;
 
+import com.google.android.libraries.places.api.model.Place;
+
 import java.io.Serializable;
 
 public class Sign implements Serializable {
-    String destination;
+    Place destination;
     String downloadUrl;
-    String from;
-    LatLon latLon;
+    Place from;
 
     public Sign() {
     }
 
-    public Sign(String destination, String from) {
+    public Sign(Place destination, Place from) {
         this.destination = destination;
         this.from = from;
     }
 
-    public Sign(String destination, String downloadUrl, String from) {
+    public Sign(Place destination, String downloadUrl, Place from) {
+        this.destination = destination;
+        this.downloadUrl = downloadUrl;
+        this.from = from;
+    }
+
+    public Sign(Place destination, Place from, double lat, double lon) {
         this.destination = destination;
         this.downloadUrl = downloadUrl;
         this.from = from;
     }
 
-    public Sign(String destination, String from, LatLon latLon) {
-        this.destination = destination;
-        this.from = from;
-        this.latLon = latLon;
-    }
-
-    public Sign(String destination, String downloadUrl, String from, LatLon latLon) {
-        this.destination = destination;
-        this.downloadUrl = downloadUrl;
-        this.from = from;
-        this.latLon = latLon;
-    }
-
-    public String getDestination() {
+    public Place getDestination() {
         return destination;
     }
 
-    public void setDestination(String destination) {
+    public void setDestination(Place destination) {
         this.destination = destination;
     }
 
@@ -51,21 +45,14 @@ public class Sign implements Serializable {
         this.downloadUrl = downloadUrl;
     }
 
-    public String getFrom() {
+    public Place getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(Place from) {
         this.from = from;
     }
 
-    public LatLon getLatLon() {
-        return latLon;
-    }
-
-    public void setLatLon(LatLon latLon) {
-        this.latLon = latLon;
-    }
 
     @Override
     public String toString() {
@@ -73,7 +60,6 @@ public class Sign implements Serializable {
                 "destination='" + destination + '\'' +
                 ", downloadUrl='" + downloadUrl + '\'' +
                 ", from='" + from + '\'' +
-                ", latLon=" + latLon +
                 '}';
     }
 }

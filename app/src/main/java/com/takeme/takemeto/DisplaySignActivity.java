@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -23,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.takeme.takemeto.model.Sign;
 import com.takeme.takemeto.module.GlideApp;
 
+import java.util.HashMap;
 
 public class DisplaySignActivity extends AppCompatActivity {
     public static final String THANKYOU = "com.takeme.takemeto.THANKYOU";
@@ -31,6 +33,9 @@ public class DisplaySignActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseDatabase database;
     private AdView mAdView;
+    HashMap fm;
+    HashMap dest;
+    ProgressBar simpleProgressBar;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -40,16 +45,20 @@ public class DisplaySignActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loadAdView();
 
+        simpleProgressBar = (ProgressBar) findViewById(R.id.simpleProgressBar);
+
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-        final String from = intent.getStringExtra(MainActivity.FROM);
-        final String destination = intent.getStringExtra(MainActivity.DESTINATION);
+        final String from = intent.getStringExtra(MainActivity.FROM).toUpperCase();
+        final String destination = intent.getStringExtra(MainActivity.DESTINATION).toUpperCase();
 
         database = FirebaseDatabase.getInstance();
 
         databaseReference = database.getReference("signs");
+
+        simpleProgressBar.setVisibility(View.VISIBLE);
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -61,18 +70,12 @@ public class DisplaySignActivity extends AppCompatActivity {
 
                 for (DataSnapshot d : dataSnapshot.child(destination).getChildren()) {
 
-                    String fm = d.child("from").getValue(String.class);
-                    String dest = d.child("destination").getValue(String.class);
+                    fm = (HashMap)d.child("from").getValue();
+                    dest = (HashMap)d.child("destination").getValue();
                     String downloadUrl = d.child("downloadUrl").getValue(String.class);
 
-                    System.out.println("FROM: " + fm);
-                    System.out.println("downloadUrl: " + downloadUrl);
-                    System.out.println("destination: " + dest);
-
-                    if (from.equalsIgnoreCase(fm)) {
+                    if (from.equalsIgnoreCase(fm.get("name").toString())) {
                         sign = new Sign();
-                        sign.setFrom(from);
-                        sign.setDestination(destination);
                         sign.setDownloadUrl(downloadUrl);
                     }
                 }
@@ -82,7 +85,7 @@ public class DisplaySignActivity extends AppCompatActivity {
                     Log.i("SIGN FOUND", "SIGN FOUND");
                     GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
                 } else {
-                    Log.i("SIGN WITH NO IMAGE", "SIGN WITH NO IMAGE, from " + from + " to " + destination);
+                    Log.i("SIGN WITH NO IMAGE", "SIGN WITH NO IMAGE, from " + from + " destination " + destination);
                     signWithNoImage();
                 }
                 else {
@@ -124,22 +127,29 @@ public class DisplaySignActivity extends AppCompatActivity {
 
     public void gotit(View view) {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = "Thank you, travel safe hope to see you soon";
+        String message = getResources().getString(R.string.signFound);
         intent.putExtra(THANKYOU, message);
         startActivity(intent);
     }
 
     private void signNotFound() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = "Thank you for using Take Me to find the sign for where you are going, Unfortunately we do not have those directions in our records";
+        String message = getResources().getString(R.string.signNotFound);
         intent.putExtra(SIGN_NOT_FOUND, message);
         startActivity(intent);
     }
 
     private void signWithNoImage() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = "Thank you for using Take Me to find the sign for where you are going, Unfortunately the directions you are looking for we do not have the sign";
+        String message = getResources().getString(R.string.signWithNoImage);
         intent.putExtra(SIGN_NOT_FOUND, message);
+        startActivity(intent);
+    }
+
+    private void error() {
+        Intent intent = new Intent(this, MainActivity.class);
+        String message = getResources().getString(R.string.genericFailure);
+        intent.putExtra(THANKYOU, message);
         startActivity(intent);
     }
 }

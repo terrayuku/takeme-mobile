@@ -130,7 +130,7 @@ public class AddSignForDirectionsTest {
 
     private void takePhotoForPixels(UiDevice device) {
 
-        // close the app selector to go back to our app so we can carry on with Espresso
+        // close the app selector destination go back destination our app so we can carry on with Espresso
 
         await(waitTimeNativeApi);
 
@@ -148,7 +148,7 @@ public class AddSignForDirectionsTest {
 
     private void takePhotoForSamsung(UiDevice device) throws UiObjectNotFoundException {
 
-        // close the app selector to go back to our app so we can carry on with Espresso
+        // close the app selector destination go back destination our app so we can carry on with Espresso
         UiObject titleTextUI = device.findObject(new UiSelector()
                 .className("android.widget.TextView")
                 .text("Camera")
