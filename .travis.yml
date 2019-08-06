@@ -22,7 +22,7 @@ script:
 deploy:
   provider: releases
   api-key: $GITHUB_TOKEN
-  file: $TRAVIS_BUILD_DIR/app/build/outputs/apk/debug/app-debug.apk
+  file: $TRAVIS_BUILD_DIR/app/build/outputs/apk/debug/takeme.apk
   skip_cleanup: true
   name: dev-build-$TRAVIS_TAG
   body: Automatic build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date +'%F %T %Z').
