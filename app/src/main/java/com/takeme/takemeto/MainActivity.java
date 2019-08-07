@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -17,6 +18,8 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.impl.Location;
 
 import androidx.annotation.NonNull;
@@ -32,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import io.fabric.sdk.android.Fabric;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,15 +49,21 @@ public class MainActivity extends AppCompatActivity {
 
     Place from;
     Place destination;
+    private FirebaseAnalytics firebaseAnalytics;
+    private Analytics analytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
         location = new Location();
 
         loadAdView();
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        analytics = new Analytics();
+        analytics.setAnalytics(firebaseAnalytics, "App Open", "App Open", "App Open");
 
         findDirections = (FloatingActionButton) findViewById(R.id.findDirections);
 
@@ -70,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
                 startActivity(addSingIntent);
             }
         });
@@ -98,14 +109,13 @@ public class MainActivity extends AppCompatActivity {
             fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
-                    // TODO: Get info about the selected place.
-                    Log.i("ADD", "Place: " + place.getName() + ", " + place.getId());
+                    analytics.setAnalytics(firebaseAnalytics, "From Search", "From", "Place Found");
                     from = place;
                 }
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    analytics.setAnalytics(firebaseAnalytics, "From Search", "From", "Place Not Found");
                 }
             });
         }
@@ -121,14 +131,13 @@ public class MainActivity extends AppCompatActivity {
             toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
-                    // TODO: Get info about the selected place.
-                    Log.i("ADD", "Place: " + place.getName() + ", " + place.getId());
+                    analytics.setAnalytics(firebaseAnalytics, "Destination Search", "Destination", "Place Found");
                     destination = place;
                 }
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    analytics.setAnalytics(firebaseAnalytics, "Destination Search", "Destination", "Place Not Found");
                 }
             });
         }
@@ -163,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
                         message.length(),
                         Spannable.SPAN_INCLUSIVE_INCLUSIVE
                 );
+                analytics.setAnalytics(firebaseAnalytics, "Thank You Message", "Thank you", "Display Sign Activity Thank You");
 
             } else if(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
 
@@ -174,23 +184,15 @@ public class MainActivity extends AppCompatActivity {
                         message.length(),
                         Spannable.SPAN_INCLUSIVE_INCLUSIVE
                 );
-
-            } else if(intent.getStringExtra(DisplaySignActivity.SIGN_COULD_NOT_BE_SHARED) != null) {
-
-                message = intent.getStringExtra(DisplaySignActivity.SIGN_COULD_NOT_BE_SHARED);
-                spannableStringBuilder = new SpannableStringBuilder(message);
-                spannableStringBuilder.setSpan(
-                        new ForegroundColorSpan(Color.RED),
-                        0,
-                        message.length(),
-                        Spannable.SPAN_INCLUSIVE_INCLUSIVE
-                );
+                analytics.setAnalytics(firebaseAnalytics, "Sign Not Found", "Sign Not Found", "Sign Not Found");
 
             } else {
                 error();
+                analytics.setAnalytics(firebaseAnalytics, "Error", "Error", "Error");
             }
 
             thankyou.setText(spannableStringBuilder);
+            analytics.setAnalytics(firebaseAnalytics, "Message", "Message", "Message Displayed");
         } else {
             error();
         }
@@ -217,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
     public void findSingButton(View view) {
         Intent findSignIntent = new Intent(this, DisplaySignActivity.class);
 
-        if(from == null && destination == null) {
+        if(from == null || destination == null) {
             SpannableStringBuilder spannableStringBuilder =  new SpannableStringBuilder(getResources().getString(R.string.noValidDirections));
             spannableStringBuilder.setSpan(
                     new ForegroundColorSpan(Color.RED),
@@ -226,9 +228,10 @@ public class MainActivity extends AppCompatActivity {
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE
             );
             thankyou.setText(spannableStringBuilder);
+            analytics.setAnalytics(firebaseAnalytics, "Directions", "Directions", "No Valid Directions Entered");
         } else {
             String message = "From " + from.getName() + " To " + destination.getName();
-
+            analytics.setAnalytics(firebaseAnalytics, "Directions", "Directions", "Search Directions Entered");
             findSignIntent.putExtra(EXTRA_MESSAGE, message);
             findSignIntent.putExtra(DESTINATION, destination.getName());
             findSignIntent.putExtra(FROM, from.getName());
@@ -240,4 +243,10 @@ public class MainActivity extends AppCompatActivity {
     private void error() {
         thankyou.setText(getResources().getString(R.string.genericFailure));
     }
+
+    // Uncomment to test crashlytics
+//    public void forceCrash(View view) {
+//        throw new RuntimeException("This is a crash");
+//    }
+
 }
