@@ -65,7 +65,7 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
 
-        databaseReference = database.getReference("signs");
+        databaseReference = database.getReference(BuildConfig.DB);
 
         simpleProgressBar.setVisibility(View.VISIBLE);
 
