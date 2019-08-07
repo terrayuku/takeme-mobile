@@ -31,6 +31,16 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            buildConfigField("String", 'BUCKET', "\"prod/images\"")
+            buildConfigField("String", 'DB', "\"prod/signs\"")
+            resValue("string", 'AdKey', "\"ca-app-pub-1696018568424604~9355875062\"")
+        }
+
+        debug {
+            buildConfigField("String", 'BUCKET', "\"images\"")
+            buildConfigField("String", 'DB', "\"signs\"")
+            resValue("string", 'AdKey', "\"ca-app-pub-3940256099942544/6300978111\"")
         }
     }
     testOptions {

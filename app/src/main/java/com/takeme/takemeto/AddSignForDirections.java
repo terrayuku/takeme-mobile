@@ -198,7 +198,7 @@ public class AddSignForDirections extends AppCompatActivity {
                 .build();
 
         Log.i("Reference", reference.getName());
-        uploadTask = reference.child("images/" + file.getLastPathSegment()).putFile(file, metadata);
+        uploadTask = reference.child(BuildConfig.BUCKET + file.getLastPathSegment()).putFile(file, metadata);
 
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -232,7 +232,7 @@ public class AddSignForDirections extends AppCompatActivity {
                 if (mAuth.getCurrentUser().isAnonymous()) {
 
                     database = FirebaseDatabase.getInstance();
-                    databaseReference = database.getReference("signs");
+                    databaseReference = database.getReference(BuildConfig.DB);
                     // download url
                     Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
