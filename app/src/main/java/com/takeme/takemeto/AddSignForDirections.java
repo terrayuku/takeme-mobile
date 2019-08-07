@@ -203,10 +203,14 @@ public class AddSignForDirections extends AppCompatActivity {
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = (100 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                message.setText(getResources().getString(R.string.uploadPrefix) + " " + Math.round(progress) + " " + getResources().getString(R.string.uploadSurfix));
+                try {
+                    double progress = (100 * taskSnapshot.getBytesTransferred()) / (double)taskSnapshot.getTotalByteCount();
+                    message.setText(getResources().getString(R.string.uploadPrefix) + " " + Math.round(progress) + " " + getResources().getString(R.string.uploadSurfix));
 
-                simpleProgressBar.setVisibility(View.VISIBLE);
+                    simpleProgressBar.setVisibility(View.VISIBLE);
+                } catch (ArithmeticException ae) {
+                    error();
+                }
 
             }
         }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {

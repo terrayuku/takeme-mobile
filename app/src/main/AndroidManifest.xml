@@ -59,6 +59,9 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="8f39959ebf675e0cf5234d64f6d9959ee9383459" />
     </application>
 
 

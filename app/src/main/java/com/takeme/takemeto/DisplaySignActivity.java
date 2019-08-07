@@ -16,11 +16,13 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.model.Sign;
 import com.takeme.takemeto.module.GlideApp;
 
@@ -37,12 +39,19 @@ public class DisplaySignActivity extends AppCompatActivity {
     HashMap dest;
     ProgressBar simpleProgressBar;
 
+    private FirebaseAnalytics firebaseAnalytics;
+    private Analytics analytics;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_sign);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        analytics = new Analytics();
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Open", "DisplaySignActivity Open", "DisplaySignActivity Open");
         loadAdView();
 
         simpleProgressBar = (ProgressBar) findViewById(R.id.simpleProgressBar);
@@ -67,29 +76,37 @@ public class DisplaySignActivity extends AppCompatActivity {
 
                 // Get Image
                 ImageView imageView = (ImageView) findViewById(R.id.imageView);
-
+                analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "DisplaySignActivity Get Directions");
                 for (DataSnapshot d : dataSnapshot.child(destination).getChildren()) {
+                    try {
+                        fm = (HashMap)d.child("from").getValue();
+                        dest = (HashMap)d.child("destination").getValue();
+                        String downloadUrl = d.child("downloadUrl").getValue(String.class);
 
-                    fm = (HashMap)d.child("from").getValue();
-                    dest = (HashMap)d.child("destination").getValue();
-                    String downloadUrl = d.child("downloadUrl").getValue(String.class);
-
-                    if (from.equalsIgnoreCase(fm.get("name").toString())) {
-                        sign = new Sign();
-                        sign.setDownloadUrl(downloadUrl);
+                        if (from.equalsIgnoreCase(fm.get("name").toString())) {
+                            sign = new Sign();
+                            sign.setDownloadUrl(downloadUrl);
+                        }
+                        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
+                    } catch(ClassCastException cast) {
+                        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
+                                cast.getMessage());
                     }
+
                 }
 
                 // Display Image
                 if (sign != null) if (sign.getDownloadUrl() != null) {
-                    Log.i("SIGN FOUND", "SIGN FOUND");
+                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
                     GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
                 } else {
-                    Log.i("SIGN WITH NO IMAGE", "SIGN WITH NO IMAGE, from " + from + " destination " + destination);
+                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                            "SIGN WITH NO IMAGE, from " + from + " destination " + destination);
                     signWithNoImage();
                 }
                 else {
-                    Log.i("SIGN NOT FOUND", SIGN_NOT_FOUND);
+                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                            SIGN_NOT_FOUND + " from " + from + " to " + destination);
                     signNotFound();
                 }
             }
@@ -99,7 +116,6 @@ public class DisplaySignActivity extends AppCompatActivity {
 
             }
         });
-        // Capture the layout's TextView and set the string as its text
         TextView directionSign = findViewById(R.id.directions_sign);
         directionSign.setText(message);
     }
@@ -117,6 +133,9 @@ public class DisplaySignActivity extends AppCompatActivity {
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Load Add", "DisplaySignActivity",
+                "Add Displayed");
+
     }
 
     @Override
@@ -129,27 +148,32 @@ public class DisplaySignActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         String message = getResources().getString(R.string.signFound);
         intent.putExtra(THANKYOU, message);
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                "Got it, happy");
         startActivity(intent);
     }
 
     private void signNotFound() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = getResources().getString(R.string.signNotFound);
-        intent.putExtra(SIGN_NOT_FOUND, message);
+        intent.putExtra(SIGN_NOT_FOUND, getResources().getString(R.string.signNotFound));
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                getResources().getString(R.string.signNotFound));
         startActivity(intent);
     }
 
     private void signWithNoImage() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = getResources().getString(R.string.signWithNoImage);
-        intent.putExtra(SIGN_NOT_FOUND, message);
+        intent.putExtra(SIGN_NOT_FOUND, getResources().getString(R.string.signWithNoImage));
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                getResources().getString(R.string.signWithNoImage));
         startActivity(intent);
     }
 
     private void error() {
         Intent intent = new Intent(this, MainActivity.class);
-        String message = getResources().getString(R.string.genericFailure);
-        intent.putExtra(THANKYOU, message);
+        intent.putExtra(SIGN_NOT_FOUND, getResources().getString(R.string.genericFailure));
+        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                getResources().getString(R.string.genericFailure));
         startActivity(intent);
     }
 }
