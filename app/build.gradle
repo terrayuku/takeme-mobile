@@ -27,6 +27,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+    signingConfigs {
+        release
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
@@ -35,6 +40,9 @@ android {
             buildConfigField("String", 'BUCKET', "\"prod/images\"")
             buildConfigField("String", 'DB', "\"prod/signs\"")
             resValue("string", 'AdKey', "\"ca-app-pub-1696018568424604~9355875062\"")
+
+            apply plugin: 'signing'
+            signingConfig signingConfigs.release
         }
 
         debug {
@@ -47,6 +55,15 @@ android {
         unitTests {
             includeAndroidResources = true
         }
+    }
+
+    def isRunningOnTravis = System.getenv("CI") == "true"
+
+    if (isRunningOnTravis) {
+        signingConfigs.release.storeFile = file("../keystore.jks")
+        signingConfigs.release.storePassword = System.getenv("keystore_password")
+        signingConfigs.release.keyAlias = System.getenv("keystore_alias")
+        signingConfigs.release.keyPassword = System.getenv("keystore_alias_password")
     }
 
     useLibrary 'android.test.runner'
