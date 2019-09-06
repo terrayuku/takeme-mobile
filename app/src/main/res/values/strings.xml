@@ -1,7 +1,7 @@
 <resources>
+    <string name="about">About</string>
+    <string name="dashboard">Dashboard</string>
     <string name="app_name">Takeme</string>
-    <string name="action_settings">About</string>
-
     <string name="from">From</string>
     <string name="destination">To</string>
     <string name="sign">Sign</string>
@@ -22,4 +22,9 @@
     <string name="signFound">Thank you for using Takeme, travel safe to your destination, hope to see you soon</string>
     <string name="signNotFound">Thank you for using Takeme, unfortunately we do not have those directions in our records</string>
     <string name="signWithNoImage">Thank you for using Takeme, unfortunately the directions you are looking for we do not have the sign for them</string>
+
+    <string name="action_add_favourite">Add to Favourites</string>
+    <string name="action_play_next">Play Next</string>
+    <string name="backdrop_title">LOVE MUSIC</string>
+    <string name="backdrop_subtitle">This season top 20 albums</string>
 </resources>

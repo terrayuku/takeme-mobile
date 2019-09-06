@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items destination the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        System.out.println("About");
         return true;
     }
 
@@ -209,7 +210,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.about) {
+            Intent findSignIntent = new Intent(this, AboutActivity.class);
+//            findSignIntent.putExtra(EXTRA_MESSAGE, "About");
+//            findSignIntent.putExtra(DESTINATION, "dest");
+//            findSignIntent.putExtra(FROM, "frm");
+            startActivity(findSignIntent);
             return true;
         }
 
