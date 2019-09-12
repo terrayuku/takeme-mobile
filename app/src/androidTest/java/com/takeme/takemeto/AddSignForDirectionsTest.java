@@ -8,7 +8,9 @@ import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.widget.SearchView;
 
+import androidx.fragment.app.Fragment;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
@@ -31,18 +33,12 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
-import static androidx.test.espresso.intent.matcher.ComponentNameMatchers.hasShortClassName;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
-import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
+import static androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.core.AllOf.allOf;
-import static org.hamcrest.core.IsNot.not;
 
 
 @RunWith(AndroidJUnit4ClassRunner.class)
@@ -82,13 +78,13 @@ public class AddSignForDirectionsTest {
     @Test
     public void validateInputs() {
 
-        onView(withId(R.id.from))
+        onView(allOf(isDescendantOfA(withId(R.id.from))))
                 .perform(typeText(from), closeSoftKeyboard());
 
-        onView(withId(R.id.destination))
+        onView(allOf(isDescendantOfA(withId(R.id.destination))))
                 .perform(typeText(to), closeSoftKeyboard());
 
-        onView(withId(R.id.uploadSign)).perform(click());
+        onView(withId(R.id.addDirections)).perform(click());
 
         takePhoto();
 
