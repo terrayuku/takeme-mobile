@@ -1,6 +1,7 @@
 language: android
 jdk: oraclejdk8
 dist: trusty
+sudo: false
 
 android:
   components:
@@ -12,9 +13,11 @@ android:
   - extra-google-m2repository
   - extra-android-m2repository
   - addon-google_apis-google-19
+  - sys-img-armeabi-v7a-android-22
 
 script:
   - "./run.sh"
+  - ./gradlew connectedAndroidTest
 
 deploy:
   - provider: releases
@@ -36,5 +39,9 @@ after_deploy:
 - rm -rf $TRAVIS_BUILD_DIR/app/build/outputs
 -
 before_install:
-- openssl aes-256-cbc -K $encrypted_5d0773461879_key -iv $encrypted_5d0773461879_iv
-  -in keystore.jks.enc -out keystore.jks -d
+  - openssl aes-256-cbc -K $encrypted_5d0773461879_key -iv $encrypted_5d0773461879_iv
+    -in keystore.jks.enc -out keystore.jks -d
+  - echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &

@@ -60,8 +60,8 @@ public class DisplaySignActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 
-        final String from = intent.getStringExtra(MainActivity.FROM).toUpperCase();
-        final String destination = intent.getStringExtra(MainActivity.DESTINATION).toUpperCase();
+        final String from = intent.getStringExtra(MainActivity.FROM);
+        final String destination = intent.getStringExtra(MainActivity.DESTINATION);
 
         database = FirebaseDatabase.getInstance();
 
@@ -77,13 +77,13 @@ public class DisplaySignActivity extends AppCompatActivity {
                 // Get Image
                 ImageView imageView = (ImageView) findViewById(R.id.imageView);
                 analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "DisplaySignActivity Get Directions");
-                for (DataSnapshot d : dataSnapshot.child(destination).getChildren()) {
+                for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
                     try {
                         fm = (HashMap)d.child("from").getValue();
                         dest = (HashMap)d.child("destination").getValue();
                         String downloadUrl = d.child("downloadUrl").getValue(String.class);
 
-                        if (from.equalsIgnoreCase(fm.get("name").toString())) {
+                        if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
                             sign = new Sign();
                             sign.setDownloadUrl(downloadUrl);
                         }
@@ -101,12 +101,12 @@ public class DisplaySignActivity extends AppCompatActivity {
                     GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
                 } else {
                     analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
-                            "SIGN WITH NO IMAGE, from " + from + " destination " + destination);
+                            "SIGN WITH NO IMAGE, from " + from.toUpperCase() + " destination " + destination.toUpperCase());
                     signWithNoImage();
                 }
                 else {
                     analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
-                            SIGN_NOT_FOUND + " from " + from + " to " + destination);
+                            SIGN_NOT_FOUND + " from " + from.toUpperCase() + " to " + destination.toUpperCase());
                     signNotFound();
                 }
             }
