@@ -28,8 +28,7 @@ script:
 - "./gradlew clean installDebug"
 - "./gradlew check"
 - "./gradlew build assembleDebug"
-- Galaxy S10 SM-G973F, API Level 28
-- gcloud firebase test android run --app $TRAVIS_BUILD_DIR/app/build/outputs/apk/debug/app-debug.apk --type=robo --device model=Nexus4,version=19
+#- gcloud firebase test android run --app $TRAVIS_BUILD_DIR/app/build/outputs/apk/debug/app-debug.apk --type=robo --device model=Nexus4,version=19
 
 deploy:
 - provider: releases
@@ -56,9 +55,5 @@ before_install:
 - emulator -avd test -no-skin -no-audio -no-window &
 - android-wait-for-emulator
 - adb shell input keyevent 82 &
-- gcloud version || true
-- travis_wait 30 if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export $CLOUDSDK_CORE_DISABLE_PROMPTS; curl https://sdk.cloud.google.com | bash; fi
-- source /home/travis/google-cloud-sdk/path.bash.inc
-- gcloud version
 - openssl aes-256-cbc -K $encrypted_5d0773461879_key -iv $encrypted_5d0773461879_iv
   -in keystore.jks.enc -out keystore.jks -d
