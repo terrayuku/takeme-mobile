@@ -26,11 +26,11 @@ android:
     - '.+'
 
 script:
-#  - "./run.sh"
+  - "./run.sh"
   - ./gradlew clean installDebug
   - ./gradlew check
   - ./gradlew testDebugUnitTest
-  - ./gradlew connectedDebugAndroidTest
+  - travis_wait ./gradlew connectedDebugAndroidTest
 
 deploy:
   - provider: releases
