@@ -25,9 +25,9 @@ android:
 
 script:
 - "./run.sh"
-- "./gradlew clean installDebug"
-- "./gradlew check"
-- "./gradlew build assembleDebug"
+#- "./gradlew clean installDebug"
+#- "./gradlew check"
+#- "./gradlew build assembleDebug"
 #- gcloud firebase test android run --app $TRAVIS_BUILD_DIR/app/build/outputs/apk/debug/app-debug.apk --type=robo --device model=Nexus4,version=19
 
 deploy:
