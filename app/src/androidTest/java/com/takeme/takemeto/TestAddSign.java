@@ -32,7 +32,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class AddingSign {
+public class TestAddSign {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -51,6 +51,7 @@ public class AddingSign {
                                                 1)),
                                 3),
                         isDisplayed()));
+        SystemClock.sleep(2000);
         floatingActionButton.perform(click());
 
         ViewInteraction appCompatEditText = onView(
@@ -62,6 +63,7 @@ public class AddingSign {
                                                 1)),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(2000);
         appCompatEditText.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
@@ -72,6 +74,7 @@ public class AddingSign {
                                         0),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(2000);
         appCompatEditText2.perform(replaceText("Sipet"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout = onView(
@@ -105,6 +108,7 @@ public class AddingSign {
                                         0),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(1000);
         appCompatEditText4.perform(replaceText("Dumsi"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout2 = onView(

@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTestEs {
+public class SearchSign {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -46,6 +46,7 @@ public class MainActivityTestEs {
                                                 0)),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(2000);
         appCompatEditText.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
@@ -56,6 +57,7 @@ public class MainActivityTestEs {
                                         0),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(2000);
         appCompatEditText2.perform(replaceText("Bara Ma"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout = onView(
@@ -89,6 +91,7 @@ public class MainActivityTestEs {
                                         0),
                                 1),
                         isDisplayed()));
+        SystemClock.sleep(1000);
         appCompatEditText4.perform(replaceText("Lenasi"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout2 = onView(
