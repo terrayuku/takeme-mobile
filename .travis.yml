@@ -30,7 +30,7 @@ script:
   - ./gradlew clean installDebug
   - ./gradlew check
   - ./gradlew testDebugUnitTest
-  - travis_wait ./gradlew connectedDebugAndroidTest
+  - ./gradlew connectedDebugAndroidTest
 
 deploy:
   - provider: releases
