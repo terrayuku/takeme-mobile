@@ -63,6 +63,5 @@ after_deploy:
 before_install:
   - openssl aes-256-cbc -K $encrypted_5d0773461879_key -iv $encrypted_5d0773461879_iv
     -in keystore.jks.enc -out keystore.jks -d
-  - echo no | android create avd --force -n test -t "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - travis_wait android-wait-for-emulator
+  - echo no | avdmanager create avd -n test -k "android-"$EMULATOR_API_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  - ./scripts/android-wait-for-emulator.sh
