@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -189,6 +190,18 @@ public class AddSignForDirections extends AppCompatActivity {
     public void uploadFile(String newSignPath) {
 
         final Uri file = Uri.fromFile(new File(newSignPath));
+        Bitmap bmp = null;
+        byte[] data = null;
+        try {
+            // Reducing image size to increase performance
+            bmp = MediaStore.Images.Media.getBitmap(getContentResolver(), file);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 20, baos);
+            data = baos.toByteArray();
+        } catch (IOException e) {
+            Log.i("ERROR_COMPRESSING", reference.getName());
+            e.printStackTrace();
+        }
 //         Save the coordinates with the download url on db
 
         metadata = new StorageMetadata.Builder()
@@ -198,7 +211,7 @@ public class AddSignForDirections extends AppCompatActivity {
                 .build();
 
         Log.i("Reference", reference.getName());
-        uploadTask = reference.child(BuildConfig.BUCKET + file.getLastPathSegment()).putFile(file, metadata);
+        uploadTask = reference.child(BuildConfig.BUCKET + file.getLastPathSegment()).putBytes(data, metadata);
 
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override
