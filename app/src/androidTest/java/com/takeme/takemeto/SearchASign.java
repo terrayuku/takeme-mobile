@@ -11,32 +11,105 @@ import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class SearchSign {
+public class SearchASign {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<LoginActivity> mActivityTestRule = new ActivityTestRule<>(LoginActivity.class);
+
+    @Before
+    public void logout() {
+        FirebaseAuth.getInstance().signOut();
+    }
 
     @Test
-    public void mainActivityTestEs() {
+    public void searchASign() {
+        ViewInteraction supportVectorDrawablesButton = onView(
+                allOf(withId(R.id.email_button), withText("Sign in with email"),
+                        childAtPosition(
+                                allOf(withId(R.id.btn_holder),
+                                        childAtPosition(
+                                                withId(R.id.container),
+                                                0)),
+                                0)));
+        SystemClock.sleep(1000);
+        supportVectorDrawablesButton.perform(scrollTo(), click());
+
+        ViewInteraction textInputEditText = onView(
+                allOf(withId(R.id.email),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.email_layout),
+                                        0),
+                                0)));
+        textInputEditText.perform(scrollTo(), replaceText("peshyuku@gmail.com"), closeSoftKeyboard());
+
+        ViewInteraction appCompatButton = onView(
+                allOf(withId(R.id.button_next), withText("Next"),
+                        childAtPosition(
+                                allOf(withId(R.id.email_top_layout),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.ScrollView")),
+                                                0)),
+                                2)));
+        SystemClock.sleep(1000);
+        appCompatButton.perform(scrollTo(), click());
+
+//        ViewInteraction textInputEditText2 = onView(
+//                allOf(withId(R.id.password),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.password_layout),
+//                                        0),
+//                                0)));
+//        textInputEditText2.perform(scrollTo(), replaceText(""), closeSoftKeyboard());
+
+        ViewInteraction textInputEditText3 = onView(
+                allOf(withId(R.id.password),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.password_layout),
+                                        0),
+                                0)));
+        SystemClock.sleep(1000);
+        textInputEditText3.perform(scrollTo(), replaceText("123456789"), closeSoftKeyboard());
+
+        ViewInteraction appCompatButton2 = onView(
+                allOf(withId(R.id.button_done), withText("Sign in"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withClassName(is("android.widget.ScrollView")),
+                                        0),
+                                4)));
+        SystemClock.sleep(1000);
+        appCompatButton2.perform(scrollTo(), click());
+        SystemClock.sleep(3000);
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.places_autocomplete_search_input),
                         childAtPosition(
@@ -46,7 +119,6 @@ public class SearchSign {
                                                 0)),
                                 1),
                         isDisplayed()));
-        SystemClock.sleep(2000);
         appCompatEditText.perform(click());
 
         ViewInteraction appCompatEditText2 = onView(
@@ -57,8 +129,7 @@ public class SearchSign {
                                         0),
                                 1),
                         isDisplayed()));
-        SystemClock.sleep(2000);
-        appCompatEditText2.perform(replaceText("Bara Ma"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText("Lehae"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout = onView(
                 allOf(childAtPosition(
@@ -91,8 +162,7 @@ public class SearchSign {
                                         0),
                                 1),
                         isDisplayed()));
-        SystemClock.sleep(1000);
-        appCompatEditText4.perform(replaceText("Lenasi"), closeSoftKeyboard());
+        appCompatEditText4.perform(replaceText("Lenasia"), closeSoftKeyboard());
 
         ViewInteraction relativeLayout2 = onView(
                 allOf(childAtPosition(
@@ -102,9 +172,8 @@ public class SearchSign {
                                         2)),
                         0),
                         isDisplayed()));
-        SystemClock.sleep(1000);
+        SystemClock.sleep(2000);
         relativeLayout2.perform(click());
-        SystemClock.sleep(1000);
 
         ViewInteraction floatingActionButton = onView(
                 allOf(withId(R.id.findDirections),
@@ -115,9 +184,8 @@ public class SearchSign {
                                                 1)),
                                 2),
                         isDisplayed()));
-        SystemClock.sleep(3000);
+        SystemClock.sleep(2000);
         floatingActionButton.perform(click());
-        SystemClock.sleep(1000);
 
         ViewInteraction floatingActionButton2 = onView(
                 allOf(withId(R.id.gotit),
@@ -127,7 +195,13 @@ public class SearchSign {
                                         0),
                                 3),
                         isDisplayed()));
+        SystemClock.sleep(3000);
         floatingActionButton2.perform(click());
+    }
+
+    @After
+    public void signOut() {
+        FirebaseAuth.getInstance().signOut();
     }
 
     private static Matcher<View> childAtPosition(

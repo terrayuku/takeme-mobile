@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 
 import com.crashlytics.android.Crashlytics;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -12,6 +13,8 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
@@ -19,6 +22,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.impl.Location;
 
@@ -29,13 +34,13 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import io.fabric.sdk.android.Fabric;
+
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,12 +56,15 @@ public class MainActivity extends AppCompatActivity {
     Place destination;
     private FirebaseAnalytics firebaseAnalytics;
     private Analytics analytics;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
+
+        auth = FirebaseAuth.getInstance();
 
         location = new Location();
 
@@ -70,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        thankyou = (TextView)findViewById(R.id.thankyou);
+        thankyou = (TextView) findViewById(R.id.thankyou);
         Intent intent = getIntent();
         displayMessage(intent);
 
@@ -102,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
             // Setting Bounds
             fromFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
+                    new LatLng(-34.277857, 18.2359139),
+                    new LatLng(-23.9116035, 29.380895)));
 
             // Set up a PlaceSelectionListener destination handle the response.
             fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -125,8 +133,8 @@ public class MainActivity extends AppCompatActivity {
             toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
 
             toFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
+                    new LatLng(-34.277857, 18.2359139),
+                    new LatLng(-23.9116035, 29.380895)));
 
             toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
@@ -141,6 +149,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = auth.getCurrentUser();
+        if(currentUser == null) {
+            // Already signed in
+            loadLoginActivity();
+        }
+    }
+    private void loadLoginActivity() {
+        Intent findSignIntent = new Intent(this, MainActivity.class);
+        startActivity(findSignIntent);
     }
 
     private void loadAdView() {
@@ -159,10 +182,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayMessage(Intent intent) {
-        if(intent != null) {
+        if (intent != null) {
             String message = "";
             SpannableStringBuilder spannableStringBuilder = null; // = new SpannableStringBuilder(message);
-            if(intent.getStringExtra(DisplaySignActivity.THANKYOU) != null) {
+            if (intent.getStringExtra(DisplaySignActivity.THANKYOU) != null) {
 
                 message = intent.getStringExtra(DisplaySignActivity.THANKYOU);
                 spannableStringBuilder = new SpannableStringBuilder(message);
@@ -174,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 );
                 analytics.setAnalytics(firebaseAnalytics, "Thank You Message", "Thank you", "Display Sign Activity Thank You");
 
-            } else if(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
+            } else if (intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
 
                 message = intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND);
                 spannableStringBuilder = new SpannableStringBuilder(message);
@@ -212,11 +235,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.about) {
             Intent findSignIntent = new Intent(this, AboutActivity.class);
-//            findSignIntent.putExtra(EXTRA_MESSAGE, "About");
-//            findSignIntent.putExtra(DESTINATION, "dest");
-//            findSignIntent.putExtra(FROM, "frm");
             startActivity(findSignIntent);
             return true;
+        } else if (id == R.id.logout) {
+            Intent loginIntent = new Intent(this, LoginActivity.class);
+            AuthUI.getInstance()
+                    .signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        public void onComplete(@NonNull Task<Void> task) {
+                            startActivity(loginIntent);
+                        }
+                    });
         }
 
         return super.onOptionsItemSelected(item);
@@ -225,8 +254,8 @@ public class MainActivity extends AppCompatActivity {
     public void findSingButton(View view) {
         Intent findSignIntent = new Intent(this, DisplaySignActivity.class);
 
-        if(from == null || destination == null) {
-            SpannableStringBuilder spannableStringBuilder =  new SpannableStringBuilder(getResources().getString(R.string.noValidDirections));
+        if (from == null || destination == null) {
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getResources().getString(R.string.noValidDirections));
             spannableStringBuilder.setSpan(
                     new ForegroundColorSpan(Color.RED),
                     0,
@@ -249,10 +278,4 @@ public class MainActivity extends AppCompatActivity {
     private void error() {
         thankyou.setText(getResources().getString(R.string.genericFailure));
     }
-
-    // Uncomment to test crashlytics
-//    public void forceCrash(View view) {
-//        throw new RuntimeException("This is a crash");
-//    }
-
 }
