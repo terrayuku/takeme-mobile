@@ -16,6 +16,7 @@ import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
+    private static final int RC_SIGN_IN = 343;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +29,9 @@ public class LoginActivity extends AppCompatActivity {
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.PhoneBuilder().build(),
+                new AuthUI.IdpConfig.PhoneBuilder()
+                        .setDefaultCountryIso("ZA")
+                        .build(),
                 new AuthUI.IdpConfig.GoogleBuilder().build());
 
         // Create and launch sign-in intent
@@ -36,9 +39,9 @@ public class LoginActivity extends AppCompatActivity {
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
                         .setAvailableProviders(providers)
-                        .setLogo(R.mipmap.taxi_layer)
+//                        .setLogo(R.mipmap.taxi_layer)
                         .build(),
-                0);
+                RC_SIGN_IN);
     }
 
     @Override
