@@ -1,6 +1,7 @@
 <resources>
     <string name="about">About</string>
     <string name="logout">Logout</string>
+    <string name="settings">Settings</string>
     <string name="dashboard">Dashboard</string>
     <string name="app_name">Takeme</string>
     <string name="from">From</string>
@@ -30,4 +31,20 @@
     <string name="backdrop_subtitle">This season top 20 albums</string>
 
     <string name="app_id">434060467469-nv82d1jbk54lialg6sg9t9dn46ffhet4.apps.googleusercontent.com</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preference Titles -->
+    <string name="profile_header">Profile</string>
+    <string name="general_header">General</string>
+
+    <!-- Messages Preferences -->
+    <string name="display_name">Display Name</string>
+    <string name="phone_number">Phone Number</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 </resources>

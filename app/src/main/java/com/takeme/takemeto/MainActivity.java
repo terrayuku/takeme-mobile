@@ -34,6 +34,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -246,6 +247,10 @@ public class MainActivity extends AppCompatActivity {
                             startActivity(loginIntent);
                         }
                     });
+        } else if(id == R.id.settings) {
+            Intent findSignIntent = new Intent(this, SettingsActivity.class);
+            startActivity(findSignIntent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
