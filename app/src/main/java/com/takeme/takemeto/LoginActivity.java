@@ -32,8 +32,7 @@ public class LoginActivity extends AppCompatActivity {
                 new AuthUI.IdpConfig.EmailBuilder().build(),
                 new AuthUI.IdpConfig.PhoneBuilder()
                         .setDefaultCountryIso("ZA")
-                        .build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
+                        .build());
 
         // Create and launch sign-in intent
         startActivityForResult(
