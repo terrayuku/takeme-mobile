@@ -1,10 +1,19 @@
 package com.takeme.takemeto;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.EditTextPreference;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -23,9 +32,60 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
+            EditTextPreference displayName = (EditTextPreference) findPreference("display_name");
+            EditTextPreference phoneNumber = (EditTextPreference) findPreference("phone_number");
+
+            if (user != null && displayName != null) {
+
+                displayName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+
+            }
+
+            if (user != null && phoneNumber != null) {
+
+                phoneNumber.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
+
+            }
+            if (displayName != null && !displayName.getText().equalsIgnoreCase("Not Set")) {
+                displayName.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        Log.i("Edited", newValue.toString());
+                        displayName.setText(newValue.toString());
+                        UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(newValue.toString())
+                                .build();
+
+                        user.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.i("USER", "SAVED");
+                                }
+                            }
+                        });
+
+                        return false;
+                    }
+                });
+
+            }
+
+            if (phoneNumber != null) {
+                phoneNumber.setEnabled(false);
+            }
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }
