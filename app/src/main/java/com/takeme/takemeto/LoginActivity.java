@@ -2,6 +2,7 @@ package com.takeme.takemeto;
 
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.crashlytics.android.Crashlytics;
@@ -48,9 +49,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 0) {
+        if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                // Successfully signed in
                 loadMainActivity();
             }
         }
@@ -61,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser != null) {
+        if (currentUser != null) {
             // Already signed in
             loadMainActivity();
         }
