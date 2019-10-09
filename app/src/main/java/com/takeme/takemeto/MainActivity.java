@@ -63,9 +63,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
-        setContentView(R.layout.activity_main);
-
         auth = FirebaseAuth.getInstance();
+        if(auth.getCurrentUser() != null) {
+            setContentView(R.layout.activity_main);
+        } else {
+            moveTaskToBack(true);
+        }
 
         location = new Location();
 
