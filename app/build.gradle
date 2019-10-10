@@ -40,6 +40,8 @@ android {
             buildConfigField("String", 'BUCKET', "\"prod/images\"")
             buildConfigField("String", 'DB', "\"prod/signs\"")
             resValue("string", 'AdKey', "\"ca-app-pub-1696018568424604~9355875062\"")
+            resValue "string", "app_version",
+                    "Version: ${defaultConfig.versionName}"
 
             apply plugin: 'signing'
             signingConfig signingConfigs.release
@@ -49,6 +51,8 @@ android {
             buildConfigField("String", 'BUCKET', "\"images\"")
             buildConfigField("String", 'DB', "\"signs\"")
             resValue("string", 'AdKey', "\"ca-app-pub-3940256099942544/6300978111\"")
+            resValue "string", "app_version",
+                    "Version: ${defaultConfig.versionName}"
         }
     }
     testOptions {

@@ -45,11 +45,7 @@
                 app:data="http://www.google.com"
                 />
         </Preference>
-        <Preference app:title="Version" app:key="version">
-            <intent
-                app:action="android.intent.action.VIEW"
-                app:data="http://www.google.com"
-                />
+        <Preference app:title="@string/app_version" app:key="version">
         </Preference>
 
     </PreferenceCategory>
