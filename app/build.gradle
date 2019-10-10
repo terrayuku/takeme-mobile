@@ -22,8 +22,8 @@ android {
         applicationId "com.takeme.takemeto"
         minSdkVersion 18
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode buildVersionCode()
+        versionName version
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -128,11 +128,5 @@ dependencies {
     annotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
 }
 
-android.applicationVariants.all { variant ->
-    variant.outputs.all {
-        def appName = "takeme"
-        outputFileName = appName + ".apk"
-    }
-}
-
 apply plugin: 'com.google.gms.google-services'
+apply from: "../artifacts.gradle"
