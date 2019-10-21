@@ -34,16 +34,8 @@
     <PreferenceCategory app:title="@string/general_header">
 
         <Preference app:title="Privacy Policy" app:key="policy">
-            <intent
-                app:action="android.intent.action.VIEW"
-                app:data="http://www.google.com"
-                />
         </Preference>
         <Preference app:title="Terms and Conditions" app:key="terms">
-            <intent
-                app:action="android.intent.action.VIEW"
-                app:data="http://www.google.com"
-                />
         </Preference>
         <Preference app:title="@string/app_version" app:key="version">
         </Preference>

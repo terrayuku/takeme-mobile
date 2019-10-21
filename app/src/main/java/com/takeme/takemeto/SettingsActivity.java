@@ -1,5 +1,7 @@
 package com.takeme.takemeto;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -41,6 +43,9 @@ public class SettingsActivity extends AppCompatActivity {
             EditTextPreference displayName = (EditTextPreference) findPreference("display_name");
             EditTextPreference phoneNumber = (EditTextPreference) findPreference("phone_number");
 
+            Preference terms = (Preference) findPreference("terms");
+            Preference policy = (Preference) findPreference("policy");
+
             if (user != null && displayName != null) {
 
                 displayName.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
@@ -79,6 +84,26 @@ public class SettingsActivity extends AppCompatActivity {
 
             if (phoneNumber != null) {
                 phoneNumber.setEnabled(false);
+            }
+
+            if(terms != null) {
+                terms.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://takemeto.co.za/#/termsandconditions")));
+                        return false;
+                    }
+                });
+            }
+
+            if(policy != null) {
+                policy.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://takemeto.co.za/#/privacy/policy")));
+                        return false;
+                    }
+                });
             }
         }
     }
