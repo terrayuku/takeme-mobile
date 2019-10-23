@@ -180,9 +180,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
             Log.i(TAG,
                     "Displaying location permission rationale to provide additional context.");
             Snackbar.make(mLayout, R.string.permission_location_rationale,

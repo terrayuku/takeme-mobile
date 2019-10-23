@@ -174,9 +174,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         // BEGIN_INCLUDE(camera_permission_request)
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.CAMERA)) {
-            // Provide an additional rationale to the user if the permission was not granted
-            // and the user would benefit from additional context for the use of the permission.
-            // For example if the user has previously denied the permission.
             Log.i(TAG,
                     "Displaying camera permission rationale to provide additional context.");
             Snackbar.make(mLayout, R.string.permission_camera_rationale,
