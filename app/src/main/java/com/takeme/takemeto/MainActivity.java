@@ -1,6 +1,8 @@
 package com.takeme.takemeto;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -21,6 +23,7 @@ import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +33,7 @@ import com.takeme.takemeto.impl.Location;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -44,7 +48,7 @@ import io.fabric.sdk.android.Fabric;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String EXTRA_MESSAGE = "com.takeme.takemeto.MESSAGE";
     public static final String FROM = "com.takeme.takemeto.FROM";
     public static final String DESTINATION = "com.takeme.takemeto.DESTINATION";
@@ -59,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
     private Analytics analytics;
     private FirebaseAuth auth;
 
+    public static final String TAG = "MainActivity";
+    private View mLayout;
+
+
+    private static final int REQUEST_LOCATION = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +79,16 @@ public class MainActivity extends AppCompatActivity {
         } else {
             moveTaskToBack(true);
         }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Location permission has not been granted.
+
+            requestLocationPermission();
+
+        }
+
+        mLayout = findViewById(R.id.thankyou);
 
         location = new Location();
 
@@ -152,6 +172,61 @@ public class MainActivity extends AppCompatActivity {
                     analytics.setAnalytics(firebaseAnalytics, "Destination Search", "Destination", "Place Not Found");
                 }
             });
+        }
+    }
+
+    private void requestLocationPermission() {
+        Log.i(TAG, "LOCATION permission has NOT been granted. Requesting permission.");
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Provide an additional rationale to the user if the permission was not granted
+            // and the user would benefit from additional context for the use of the permission.
+            // For example if the user has previously denied the permission.
+            Log.i(TAG,
+                    "Displaying location permission rationale to provide additional context.");
+            Snackbar.make(mLayout, R.string.permission_location_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                    REQUEST_LOCATION);
+                        }
+                    })
+                    .show();
+        } else {
+
+            // Camera permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_LOCATION) {
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for location permission.
+            Log.i(TAG, "Received response for LOCATION permission request.");
+
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i(TAG, "LOCATION permission has now been granted. Showing preview.");
+                Snackbar.make(mLayout, R.string.permision_available_location,
+                        Snackbar.LENGTH_SHORT).show();
+            } else {
+                Log.i(TAG, "LOCATION permission was NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT).show();
+            }
+        }  else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
