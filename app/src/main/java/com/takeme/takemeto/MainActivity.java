@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             moveTaskToBack(true);
         }
 
+        mLayout = findViewById(R.id.thankyou);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Location permission has not been granted.
@@ -87,8 +89,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             requestLocationPermission();
 
         }
-
-        mLayout = findViewById(R.id.thankyou);
 
         location = new Location();
 
