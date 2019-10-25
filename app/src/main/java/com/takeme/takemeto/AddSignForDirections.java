@@ -94,6 +94,8 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_sign_for_directions);
 
+        mLayout = findViewById(R.id.message);
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             // Camera permission has not been granted.
@@ -101,8 +103,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
             requestCameraPermission();
 
         }
-
-        mLayout = findViewById(R.id.message);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loadAdView();
