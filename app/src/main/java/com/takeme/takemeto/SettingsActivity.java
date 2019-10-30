@@ -57,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity {
                 phoneNumber.setText(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
 
             }
-            if (displayName != null && !displayName.getText().equalsIgnoreCase("Not Set")) {
+            if (displayName != null || !displayName.getText().equalsIgnoreCase("Not Set")) {
                 displayName.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
