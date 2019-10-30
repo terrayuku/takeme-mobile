@@ -28,7 +28,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.takeme.takemeto.impl.Analytics;
-import com.takeme.takemeto.impl.Location;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     TextView thankyou;
     FloatingActionButton findDirections;
     private AdView mAdView;
-    Location location;
 
     Place from;
     Place destination;
@@ -74,105 +72,102 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         auth = FirebaseAuth.getInstance();
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        analytics = new Analytics();
+        analytics.setAnalytics(firebaseAnalytics, "App Open", "App Open", "App Open");
+
+        initializePlaces();
+
         if(auth.getCurrentUser() != null) {
             setContentView(R.layout.activity_main);
         } else {
             moveTaskToBack(true);
         }
 
-        mLayout = findViewById(R.id.thankyou);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Location permission has not been granted.
-
-            requestLocationPermission();
-
-        }
-
-        location = new Location();
-
-        loadAdView();
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        analytics = new Analytics();
-        analytics.setAnalytics(firebaseAnalytics, "App Open", "App Open", "App Open");
-
+        mAdView = findViewById(R.id.adMain);
         findDirections = (FloatingActionButton) findViewById(R.id.findDirections);
+        thankyou = (TextView) findViewById(R.id.thankyou);
+        mLayout = thankyou;
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        thankyou = (TextView) findViewById(R.id.thankyou);
         Intent intent = getIntent();
         displayMessage(intent);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestLocationPermission();
+        }
 
         final Intent addSingIntent = new Intent(this, AddSignForDirections.class);
 
         FloatingActionButton fab = findViewById(R.id.addDirections);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
-                startActivity(addSingIntent);
-            }
-        });
-
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
+        if(fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
+                    startActivity(addSingIntent);
+                }
+            });
         }
-//        PlacesClient placesClient = Places.createClient(this);
 
-        // Initialize the AutocompleteSupportFragment.
-        AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.from);
         AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.destination);
 
-        if (fromFragment != null) {
-            fromFragment.setHint("From...");
-            fromFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+        AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.from);
 
-            // Setting Bounds
-            fromFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857, 18.2359139),
-                    new LatLng(-23.9116035, 29.380895)));
+        if(fromFragment != null && toFragment != null) {
 
-            // Set up a PlaceSelectionListener destination handle the response.
-            fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
-                    analytics.setAnalytics(firebaseAnalytics, "From Search", "From", "Place Found");
+                    analytics.setAnalytics(firebaseAnalytics, "From", fromFragment.getTag(), "Place Found");
                     from = place;
                 }
 
                 @Override
                 public void onError(@NonNull Status status) {
-                    analytics.setAnalytics(firebaseAnalytics, "From Search", "From", "Place Not Found");
+                    analytics.setAnalytics(firebaseAnalytics, "From", fromFragment.getTag(), "Place Not Found");
                 }
             });
-        }
 
-        if (toFragment != null) {
-            toFragment.setHint("To...");
-            toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-
-            toFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857, 18.2359139),
-                    new LatLng(-23.9116035, 29.380895)));
-
-            toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
-                    analytics.setAnalytics(firebaseAnalytics, "Destination Search", "Destination", "Place Found");
+                    analytics.setAnalytics(firebaseAnalytics, "To", toFragment.getTag(), "Place Found");
                     destination = place;
                 }
 
                 @Override
                 public void onError(@NonNull Status status) {
-                    analytics.setAnalytics(firebaseAnalytics, "Destination Search", "Destination", "Place Not Found");
+                    analytics.setAnalytics(firebaseAnalytics, "To", toFragment.getTag(), "Place Not Found");
                 }
             });
         }
+
+        loadAdView();
+
+    }
+
+    private void initializePlaces() {
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
+        }
+    }
+
+    private AutocompleteSupportFragment setPlace(AutocompleteSupportFragment fragment, String hint) {
+        fragment.setHint(hint);
+        fragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+
+        fragment.setLocationBias(RectangularBounds.newInstance(
+                new LatLng(-34.277857, 18.2359139),
+                new LatLng(-23.9116035, 29.380895)));
+
+        return fragment;
     }
 
     private void requestLocationPermission() {
@@ -250,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             }
         });
 
-        mAdView = findViewById(R.id.adMain);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
@@ -259,42 +253,41 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     private void displayMessage(Intent intent) {
         if (intent != null) {
-            String message = "";
-            SpannableStringBuilder spannableStringBuilder = null; // = new SpannableStringBuilder(message);
+
+            SpannableStringBuilder spannableStringBuilder = null;
             if (intent.getStringExtra(DisplaySignActivity.THANKYOU) != null) {
 
-                message = intent.getStringExtra(DisplaySignActivity.THANKYOU);
-                spannableStringBuilder = new SpannableStringBuilder(message);
-                spannableStringBuilder.setSpan(
-                        new ForegroundColorSpan(Color.BLACK),
-                        0,
-                        message.length(),
-                        Spannable.SPAN_INCLUSIVE_INCLUSIVE
-                );
+                spannableStringBuilder = message(intent.getStringExtra(DisplaySignActivity.THANKYOU), intent);
+                thankyou.setText(spannableStringBuilder);
                 analytics.setAnalytics(firebaseAnalytics, "Thank You Message", "Thank you", "Display Sign Activity Thank You");
 
             } else if (intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
 
-                message = intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND);
-                spannableStringBuilder = new SpannableStringBuilder(message);
-                spannableStringBuilder.setSpan(
-                        new ForegroundColorSpan(Color.RED),
-                        0,
-                        message.length(),
-                        Spannable.SPAN_INCLUSIVE_INCLUSIVE
-                );
+                spannableStringBuilder = message(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND), intent);
+                thankyou.setText(spannableStringBuilder);
                 analytics.setAnalytics(firebaseAnalytics, "Sign Not Found", "Sign Not Found", "Sign Not Found");
 
             } else {
-                error();
-                analytics.setAnalytics(firebaseAnalytics, "Error", "Error", "Error");
+                analytics.setAnalytics(firebaseAnalytics, "No Action", "No Action", "No Action");
             }
-
-            thankyou.setText(spannableStringBuilder);
-            analytics.setAnalytics(firebaseAnalytics, "Message", "Message", "Message Displayed");
         } else {
             error();
         }
+    }
+
+    private SpannableStringBuilder message(String extra, Intent intent) {
+        String message = "";
+        SpannableStringBuilder spannableStringBuilder = null;
+        message = intent.getStringExtra(extra);
+        spannableStringBuilder = new SpannableStringBuilder(message);
+        spannableStringBuilder.setSpan(
+                new ForegroundColorSpan(Color.RED),
+                0,
+                message.length(),
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        );
+
+        return spannableStringBuilder;
     }
 
     @Override
