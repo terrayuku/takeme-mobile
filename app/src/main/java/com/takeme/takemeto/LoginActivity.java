@@ -89,6 +89,12 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        moveTaskToBack(true);
+    }
+
     private void loadMainActivity() {
         Intent findSignIntent = new Intent(this, MainActivity.class);
         startActivity(findSignIntent);
