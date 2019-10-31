@@ -122,19 +122,16 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
             Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
         }
 
+        Location location = new Location();
+
         AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.from);
         AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.to);
 
-        if (fromFragment != null) {
-            fromFragment.setHint("From...");
-            fromFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-            fromFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
-
-            fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        if(fromFragment != null && toFragment != null) {
+            // E/Places: Error while autocompleting: TIMEOU
+            location.setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     from = place;
@@ -142,19 +139,11 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    message.setText(getResources().getString(R.string.location_error));
                 }
             });
-        }
 
-        if (toFragment != null) {
-            toFragment.setHint("To...");
-            toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-            toFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
-
-            toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            location.setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     destination = place;
@@ -162,7 +151,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    message.setText(getResources().getString(R.string.location_error));
                 }
             });
         }
