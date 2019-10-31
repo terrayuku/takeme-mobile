@@ -28,6 +28,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.takeme.takemeto.impl.Analytics;
+import com.takeme.takemeto.impl.Location;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     private FirebaseAnalytics firebaseAnalytics;
     private Analytics analytics;
     private FirebaseAuth auth;
+    Location location;
 
     public static final String TAG = "MainActivity";
     private View mLayout;
@@ -89,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         findDirections = (FloatingActionButton) findViewById(R.id.findDirections);
         thankyou = (TextView) findViewById(R.id.thankyou);
         mLayout = thankyou;
+
+        location = new Location();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -121,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                 getSupportFragmentManager().findFragmentById(R.id.from);
 
         if(fromFragment != null && toFragment != null) {
-
-            setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            // E/Places: Error while autocompleting: TIMEOU
+            location.setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     analytics.setAnalytics(firebaseAnalytics, "From", fromFragment.getTag(), "Place Found");
@@ -135,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
                 }
             });
 
-            setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            location.setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     analytics.setAnalytics(firebaseAnalytics, "To", toFragment.getTag(), "Place Found");
@@ -248,7 +252,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
-        mAdView.loadAd(adRequest);
+        try {
+            mAdView.loadAd(adRequest);
+        } catch (NullPointerException npe) {
+            return;
+        }
     }
 
     private void displayMessage(Intent intent) {
@@ -257,13 +265,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             SpannableStringBuilder spannableStringBuilder = null;
             if (intent.getStringExtra(DisplaySignActivity.THANKYOU) != null) {
 
-                spannableStringBuilder = message(intent.getStringExtra(DisplaySignActivity.THANKYOU), intent);
+                spannableStringBuilder = location.message(DisplaySignActivity.THANKYOU, intent);
                 thankyou.setText(spannableStringBuilder);
                 analytics.setAnalytics(firebaseAnalytics, "Thank You Message", "Thank you", "Display Sign Activity Thank You");
 
             } else if (intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
 
-                spannableStringBuilder = message(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND), intent);
+                spannableStringBuilder = location.message(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND), intent);
                 thankyou.setText(spannableStringBuilder);
                 analytics.setAnalytics(firebaseAnalytics, "Sign Not Found", "Sign Not Found", "Sign Not Found");
 
@@ -273,21 +281,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         } else {
             error();
         }
-    }
-
-    private SpannableStringBuilder message(String extra, Intent intent) {
-        String message = "";
-        SpannableStringBuilder spannableStringBuilder = null;
-        message = intent.getStringExtra(extra);
-        spannableStringBuilder = new SpannableStringBuilder(message);
-        spannableStringBuilder.setSpan(
-                new ForegroundColorSpan(Color.RED),
-                0,
-                message.length(),
-                Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        );
-
-        return spannableStringBuilder;
     }
 
     @Override
