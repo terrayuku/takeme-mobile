@@ -32,9 +32,9 @@ public class DisplaySignActivity extends AppCompatActivity {
     public static final String THANKYOU = "com.takeme.takemeto.THANKYOU";
     public static final String SIGN_NOT_FOUND = "com.takeme.takemeto.SOGN_NOT_FOUND";
     public static final String SIGN_COULD_NOT_BE_SHARED = "com.takeme.takemeto.SIGN_COULD_NOT_BE_SHARED";
-    private DatabaseReference databaseReference;
-    private FirebaseDatabase database;
-    private AdView mAdView;
+    DatabaseReference databaseReference;
+    FirebaseDatabase database;
+    AdView mAdView;
     HashMap fm;
     HashMap dest;
     ProgressBar simpleProgressBar;
@@ -74,41 +74,13 @@ public class DisplaySignActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Sign sign = null;
 
-                // Get Image
-                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+
                 analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "DisplaySignActivity Get Directions");
-                for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
-                    try {
-                        fm = (HashMap)d.child("from").getValue();
-                        dest = (HashMap)d.child("destination").getValue();
-                        String downloadUrl = d.child("downloadUrl").getValue(String.class);
-
-                        if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
-                            sign = new Sign();
-                            sign.setDownloadUrl(downloadUrl);
-                        }
-                        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
-                    } catch(ClassCastException cast) {
-                        analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
-                                cast.getMessage());
-                    }
-
-                }
+                // Get Image
+                sign = getSign(from, destination, dataSnapshot);
 
                 // Display Image
-                if (sign != null) if (sign.getDownloadUrl() != null) {
-                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
-                    GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
-                } else {
-                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
-                            "SIGN WITH NO IMAGE, from " + from.toUpperCase() + " destination " + destination.toUpperCase());
-                    signWithNoImage();
-                }
-                else {
-                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
-                            SIGN_NOT_FOUND + " from " + from.toUpperCase() + " to " + destination.toUpperCase());
-                    signNotFound();
-                }
+                displaySign(from, destination, sign);
             }
 
             @Override
@@ -118,6 +90,48 @@ public class DisplaySignActivity extends AppCompatActivity {
         });
         TextView directionSign = findViewById(R.id.directions_sign);
         directionSign.setText(message);
+    }
+
+    private void displaySign(String from, String destination, Sign sign) {
+
+        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+
+        if (sign != null) if (sign.getDownloadUrl() != null) {
+            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
+            GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+        } else {
+            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                    "SIGN WITH NO IMAGE, from " + from.toUpperCase() + " destination " + destination.toUpperCase());
+            signWithNoImage();
+        }
+        else {
+            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
+                    SIGN_NOT_FOUND + " from " + from.toUpperCase() + " to " + destination.toUpperCase());
+            signNotFound();
+        }
+    }
+
+    private Sign getSign(String from, String destination, DataSnapshot dataSnapshot) {
+        Sign sign = new Sign();
+        for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
+            try {
+                fm = (HashMap)d.child("from").getValue();
+                dest = (HashMap)d.child("destination").getValue();
+                String downloadUrl = d.child("downloadUrl").getValue(String.class);
+
+                if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
+                    sign = new Sign();
+                    sign.setDownloadUrl(downloadUrl);
+                }
+                analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
+                return  sign;
+            } catch(ClassCastException cast) {
+                analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
+                        cast.getMessage());
+            }
+
+        }
+        return null;
     }
 
     private void loadAdView() {
