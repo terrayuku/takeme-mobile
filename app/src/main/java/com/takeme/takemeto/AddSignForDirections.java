@@ -2,9 +2,12 @@ package com.takeme.takemeto;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -41,6 +44,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +58,7 @@ import com.google.firebase.storage.UploadTask;
 import com.takeme.takemeto.impl.Location;
 import com.takeme.takemeto.model.Sign;
 
-public class AddSignForDirections extends AppCompatActivity {
+public class AddSignForDirections extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     public static final String THANKYOU = "com.takeme.takemeto.THANKYOU";
 
@@ -77,12 +81,28 @@ public class AddSignForDirections extends AppCompatActivity {
     Place from;
     Place destination;
     ProgressBar simpleProgressBar;
+    public static final String TAG = "AddSignForDirections";
+    private View mLayout;
+
+
+    private static final int REQUEST_CAMERA = 0;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_sign_for_directions);
+
+        mLayout = findViewById(R.id.message);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Camera permission has not been granted.
+
+            requestCameraPermission();
+
+        }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         loadAdView();
@@ -102,19 +122,16 @@ public class AddSignForDirections extends AppCompatActivity {
             Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
         }
 
+        Location location = new Location();
+
         AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.from);
         AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.to);
 
-        if (fromFragment != null) {
-            fromFragment.setHint("From...");
-            fromFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-            fromFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
-
-            fromFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        if(fromFragment != null && toFragment != null) {
+            // E/Places: Error while autocompleting: TIMEOU
+            location.setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     from = place;
@@ -122,19 +139,11 @@ public class AddSignForDirections extends AppCompatActivity {
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    message.setText(getResources().getString(R.string.location_error));
                 }
             });
-        }
 
-        if (toFragment != null) {
-            toFragment.setHint("To...");
-            toFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-            toFragment.setLocationBias(RectangularBounds.newInstance(
-                    new LatLng(-34.277857,18.2359139),
-                    new LatLng(-23.9116035,29.380895)));
-
-            toFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            location.setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
                 public void onPlaceSelected(Place place) {
                     destination = place;
@@ -142,9 +151,62 @@ public class AddSignForDirections extends AppCompatActivity {
 
                 @Override
                 public void onError(@NonNull Status status) {
-
+                    message.setText(getResources().getString(R.string.location_error));
                 }
             });
+        }
+    }
+
+    private void requestCameraPermission() {
+        Log.i(TAG, "CAMERA permission has NOT been granted. Requesting permission.");
+
+        // BEGIN_INCLUDE(camera_permission_request)
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            Log.i(TAG,
+                    "Displaying camera permission rationale to provide additional context.");
+            Snackbar.make(mLayout, R.string.permission_camera_rationale,
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction(R.string.ok, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            ActivityCompat.requestPermissions(AddSignForDirections.this,
+                                    new String[]{Manifest.permission.CAMERA},
+                                    REQUEST_CAMERA);
+                        }
+                    })
+                    .show();
+        } else {
+
+            // Camera permission has not been granted yet. Request it directly.
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    REQUEST_CAMERA);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == REQUEST_CAMERA) {
+            // BEGIN_INCLUDE(permission_result)
+            // Received permission result for camera permission.
+            Log.i(TAG, "Received response for Camera permission request.");
+
+            // Check if the only required permission has been granted
+            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Camera permission has been granted, preview can be displayed
+                Log.i(TAG, "CAMERA permission has now been granted. Showing preview.");
+                Snackbar.make(mLayout, R.string.permision_available_camera,
+                        Snackbar.LENGTH_SHORT).show();
+            } else {
+                Log.i(TAG, "CAMERA permission was NOT granted.");
+                Snackbar.make(mLayout, R.string.permissions_not_granted,
+                        Snackbar.LENGTH_SHORT).show();
+            }
+        }  else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
