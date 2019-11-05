@@ -56,4 +56,11 @@
     <string name="permissions_not_granted">Permissions were not granted.</string>
     <string name="permission_camera_rationale">Camera permission is needed to show the camera preview.</string>
     <string name="permission_location_rationale">Location permission is needed.</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="create_new_account">Create new account!</string>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+    </style>
+
 </resources>
