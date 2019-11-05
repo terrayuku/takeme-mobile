@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
@@ -15,6 +17,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -27,7 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private static final int RC_SIGN_IN = 343;
     Button login;
-    private AdView mAdView;
+    AdView mAdView;
+    View mLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,20 +43,29 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.home);
 
         auth = FirebaseAuth.getInstance();
-        login = (Button)findViewById(R.id.login);
+        login = (Button) findViewById(R.id.login);
+        mLayout = (TextView) findViewById(R.id.snackbar_text);
+
+        EditText email = (EditText) findViewById(R.id.email);
+        EditText password = (EditText) findViewById(R.id.password);
+
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                loadAuthUI();
+                if (email != null && password != null) {
+                    signIn(email.getText().toString().trim(), password.getText().toString().trim());
+                } else {
+                    Snackbar.make(mLayout, "Authentication failed.",
+                            Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
-        loadAuthUI();
         loadAdView();
     }
 
-    private void  loadAuthUI() {
+    private void loadAuthUI() {
         // Choose authentication providers
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -65,6 +81,23 @@ public class LoginActivity extends AppCompatActivity {
 //                        .setLogo(R.mipmap.taxi_layer)
                         .build(),
                 RC_SIGN_IN);
+    }
+
+    private void signIn(String email, String password) {
+
+        auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            loadMainActivity();
+                        } else {
+                            Snackbar.make(mLayout, task.getException().getMessage(),
+                                    Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
     }
 
     @Override
