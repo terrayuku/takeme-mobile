@@ -1,23 +1,32 @@
 package com.takeme.takemeto;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isLogin = true;
     private boolean isFPassword = false;
     private TextView signUp, forgotPassword;
-    private EditText etPassword, etEmail;
+    private EditText etPassword, etEmail, name, surname;
     Button login;
     AdView mAdView;
     View mLayout;
@@ -51,6 +60,11 @@ public class LoginActivity extends AppCompatActivity {
         forgotPassword = findViewById(R.id.forgot_password_login);
         etEmail = findViewById(R.id.email);
         etPassword = findViewById(R.id.password);
+        name = findViewById(R.id.name);
+        surname = findViewById(R.id.surname);
+
+        name.setVisibility(View.GONE);
+        surname.setVisibility(View.GONE);
 
         forgotPassword.setOnClickListener(v -> {
             isFPassword = true;
@@ -65,18 +79,30 @@ public class LoginActivity extends AppCompatActivity {
                 isFPassword = false;
                 etPassword.setVisibility(View.VISIBLE);
                 login.setText("Login");
+
+                name.setVisibility(View.GONE);
+                surname.setVisibility(View.GONE);
+
                 forgotPassword.setVisibility(View.VISIBLE);
                 signUp.setText(getResources().getString(R.string.create_new_account));
             }else {
                 if (isLogin) {
                     isLogin = false;
                     forgotPassword.setVisibility(View.GONE);
+
+                    name.setVisibility(View.VISIBLE);
+                    surname.setVisibility(View.VISIBLE);
+
                     login.setText("Sign Up");
                     signUp.setText("Already have an account? Sign In!");
                 } else {
                     isLogin = true;
                     login.setText("Login");
                     signUp.setText(getResources().getString(R.string.create_new_account));
+
+                    name.setVisibility(View.GONE);
+                    surname.setVisibility(View.GONE);
+
                     forgotPassword.setVisibility(View.VISIBLE);
                 }
             }
@@ -91,7 +117,9 @@ public class LoginActivity extends AppCompatActivity {
                 if (isLogin)
                     signIn(mEmail, mPass);
                 else
-                    signUp(mEmail, mPass);
+                    signUp(mEmail, mPass,
+                            name.getText().toString().trim(),
+                            surname.getText().toString().trim());
             }
         });
 
@@ -172,7 +200,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void signUp(String email, String password) {
+    private void signUp(String email, String password, String name, String surname) {
         if (TextUtils.isEmpty(email)) {
             Snackbar snackbar = Snackbar.make(mLayout, "Enter Email address", Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -210,14 +238,26 @@ public class LoginActivity extends AppCompatActivity {
                     if (!task.isSuccessful()) {
                         if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                             Snackbar snackbar = Snackbar.make(mLayout,
-                                    "User with this  Email address,already exists", Snackbar.LENGTH_LONG);
+                                    "User with this  Email address, already exists", Snackbar.LENGTH_LONG);
                             snackbar.show();
                         }
                     } else {
-                        Snackbar snackbar = Snackbar.make(mLayout,
-                                "User Created With " + email, Snackbar.LENGTH_LONG);
-                        snackbar.show();
-                        loadMainActivity();
+                        UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
+                                .setDisplayName(name + " " + surname)
+                                .build();
+
+                        auth.getCurrentUser().updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Snackbar snackbar = Snackbar.make(mLayout,
+                                            "User Created With " + email, Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                    loadMainActivity();
+                                }
+                            }
+                        });
+
                     }
                 });
     }

@@ -304,7 +304,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
 
                 final Sign sign = new Sign(destination, from);
 
-                if (mAuth.getCurrentUser().isAnonymous()) {
+                if (mAuth.getCurrentUser() != null) {
 
                     database = FirebaseDatabase.getInstance();
                     databaseReference = database.getReference(BuildConfig.DB);
@@ -314,6 +314,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                         public void onSuccess(Uri uri) {
 
                             sign.setDownloadUrl(uri.toString());
+                            sign.setUserUID(mAuth.getCurrentUser().getUid());
 
                             databaseReference.child(sign.getDestination().getName().toUpperCase()).push().setValue(sign).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
