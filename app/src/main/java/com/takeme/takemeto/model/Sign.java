@@ -8,6 +8,7 @@ public class Sign implements Serializable {
     Place destination;
     String downloadUrl;
     Place from;
+    String userUID;
 
     public Sign() {
     }
@@ -21,6 +22,13 @@ public class Sign implements Serializable {
         this.destination = destination;
         this.downloadUrl = downloadUrl;
         this.from = from;
+    }
+
+    public Sign(Place destination, String downloadUrl, Place from, String userUID) {
+        this.destination = destination;
+        this.downloadUrl = downloadUrl;
+        this.from = from;
+        this.userUID = userUID;
     }
 
     public Sign(Place destination, Place from, double lat, double lon) {
@@ -53,13 +61,21 @@ public class Sign implements Serializable {
         this.from = from;
     }
 
+    public String getUserUID() {
+        return userUID;
+    }
+
+    public void setUserUID(String userUID) {
+        this.userUID = userUID;
+    }
 
     @Override
     public String toString() {
         return "Sign{" +
-                "destination='" + destination + '\'' +
+                "destination=" + destination +
                 ", downloadUrl='" + downloadUrl + '\'' +
-                ", from='" + from + '\'' +
+                ", from=" + from +
+                ", userUID='" + userUID + '\'' +
                 '}';
     }
 }
