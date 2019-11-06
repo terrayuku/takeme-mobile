@@ -20,7 +20,7 @@ android {
     buildToolsVersion "29.0.0"
     defaultConfig {
         applicationId "com.takeme.takemeto"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 29
         versionCode buildVersionCode()
         versionName version
