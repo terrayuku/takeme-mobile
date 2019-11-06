@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,7 +29,7 @@ import java.util.HashMap;
 
 public class DisplaySignActivity extends AppCompatActivity {
     public static final String THANKYOU = "com.takeme.takemeto.THANKYOU";
-    public static final String SIGN_NOT_FOUND = "com.takeme.takemeto.SOGN_NOT_FOUND";
+    public static final String SIGN_NOT_FOUND = "com.takeme.takemeto.SIGN_NOT_FOUND";
     public static final String SIGN_COULD_NOT_BE_SHARED = "com.takeme.takemeto.SIGN_COULD_NOT_BE_SHARED";
     DatabaseReference databaseReference;
     FirebaseDatabase database;
@@ -113,23 +112,24 @@ public class DisplaySignActivity extends AppCompatActivity {
 
     private Sign getSign(String from, String destination, DataSnapshot dataSnapshot) {
         Sign sign = new Sign();
-        for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
-            try {
-                fm = (HashMap)d.child("from").getValue();
-                dest = (HashMap)d.child("destination").getValue();
+
+        try {
+
+            dataSnapshot.child(destination.toUpperCase()).getChildren().forEach(d -> {
+                fm = (HashMap) d.child("from").getValue();
+                dest = (HashMap) d.child("destination").getValue();
                 String downloadUrl = d.child("downloadUrl").getValue(String.class);
 
                 if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
-                    sign = new Sign();
                     sign.setDownloadUrl(downloadUrl);
                 }
                 analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
-                return  sign;
-            } catch(ClassCastException cast) {
-                analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
-                        cast.getMessage());
-            }
+            });
+            return sign;
 
+        } catch (ClassCastException cast) {
+            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
+                    cast.getMessage());
         }
         return null;
     }
