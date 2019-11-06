@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
             } else if (intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND) != null) {
 
-                spannableStringBuilder = location.message(intent.getStringExtra(DisplaySignActivity.SIGN_NOT_FOUND), intent);
+                spannableStringBuilder = location.message(DisplaySignActivity.SIGN_NOT_FOUND, intent);
                 thankyou.setText(spannableStringBuilder);
                 analytics.setAnalytics(firebaseAnalytics, "Sign Not Found", "Sign Not Found", "Sign Not Found");
 
