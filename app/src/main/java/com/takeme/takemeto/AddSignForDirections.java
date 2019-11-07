@@ -115,8 +115,8 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         reference = FirebaseStorage.getInstance().getReference();
 
         mAuth = FirebaseAuth.getInstance();
-        mAuth.signOut();
-        signInAnonymously();
+//        mAuth.signOut();
+//        signInAnonymously();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
