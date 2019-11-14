@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             setContentView(R.layout.activity_main);
         } else {
             moveTaskToBack(true);
+            finish();
         }
 
         mAdView = findViewById(R.id.adMain);
@@ -343,5 +344,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     private void error() {
         thankyou.setText(getResources().getString(R.string.genericFailure));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        finish();
     }
 }

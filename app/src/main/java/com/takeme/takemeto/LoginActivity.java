@@ -290,6 +290,13 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        moveTaskToBack(true);
+        finish();
+    }
+
     private void loadMainActivity() {
         Intent findSignIntent = new Intent(this, MainActivity.class);
         startActivity(findSignIntent);
