@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         if(auth.getCurrentUser() != null) {
             setContentView(R.layout.activity_main);
         } else {
-            moveTaskToBack(true);
             finish();
         }
 
@@ -238,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         }
     }
     private void loadLoginActivity() {
-        Intent findSignIntent = new Intent(this, MainActivity.class);
+        Intent findSignIntent = new Intent(this, LoginActivity.class);
         startActivity(findSignIntent);
     }
 
@@ -301,14 +300,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             startActivity(findSignIntent);
             return true;
         } else if (id == R.id.logout) {
-            Intent loginIntent = new Intent(this, LoginActivity.class);
-            AuthUI.getInstance()
-                    .signOut(this)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        public void onComplete(@NonNull Task<Void> task) {
-                            startActivity(loginIntent);
-                        }
-                    });
+            logout();
         } else if(id == R.id.settings) {
             Intent findSignIntent = new Intent(this, SettingsActivity.class);
             startActivity(findSignIntent);
@@ -351,5 +343,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onBackPressed();
         moveTaskToBack(true);
         finish();
+    }
+
+    private void logout() {
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        FirebaseAuth.getInstance().signOut();
+        loadLoginActivity();
     }
 }
