@@ -128,7 +128,7 @@ public class DisplaySignActivity extends AppCompatActivity {
 //                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
 //                });
 //            }
-            for (DataSnapshot d : dataSnapshot.child(destination).getChildren()) {
+            for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
 
                 fm = (HashMap)d.child("from").getValue();
                 dest = (HashMap)d.child("destination").getValue();
