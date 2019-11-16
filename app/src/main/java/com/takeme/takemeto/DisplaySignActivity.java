@@ -116,17 +116,28 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         try {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                dataSnapshot.child(destination.toUpperCase()).getChildren().forEach(d -> {
-                    fm = (HashMap) d.child("from").getValue();
-                    dest = (HashMap) d.child("destination").getValue();
-                    String downloadUrl = d.child("downloadUrl").getValue(String.class);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                dataSnapshot.child(destination.toUpperCase()).getChildren().forEach(d -> {
+//                    fm = (HashMap) d.child("from").getValue();
+//                    dest = (HashMap) d.child("destination").getValue();
+//                    String downloadUrl = d.child("downloadUrl").getValue(String.class);
+//
+//                    if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
+//                        sign.setDownloadUrl(downloadUrl);
+//                    }
+//                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
+//                });
+//            }
+            for (DataSnapshot d : dataSnapshot.child(destination).getChildren()) {
 
-                    if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
-                        sign.setDownloadUrl(downloadUrl);
-                    }
-                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
-                });
+                fm = (HashMap)d.child("from").getValue();
+                dest = (HashMap)d.child("destination").getValue();
+                String downloadUrl = d.child("downloadUrl").getValue(String.class);
+
+                if (from.equalsIgnoreCase(fm.get("name").toString())) {
+                    sign = new Sign();
+                    sign.setDownloadUrl(downloadUrl);
+                }
             }
             return sign;
 
