@@ -140,7 +140,7 @@
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="@+id/password"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/password"
+        app:layout_constraintStart_toStartOf="@+id/email"
         app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <com.google.android.gms.ads.AdView
