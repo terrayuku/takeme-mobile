@@ -39,11 +39,13 @@ deploy:
   body: Automatic build of $TRAVIS_BRANCH ($TRAVIS_COMMIT) built by Travis CI on $(date
     +'%F %T %Z').
   prerelease: true
+  edge: true
   overwrite: true
   target_commitish: "$TRAVIS_COMMIT"
   on:
     tags: true
     branch: develop
+
 after_deploy:
 - rm -rf $TRAVIS_BUILD_DIR/app/build/outputs
 
