@@ -9,6 +9,7 @@ public class Sign implements Serializable {
     String downloadUrl;
     Place from;
     String userUID;
+    String price;
 
     public Sign() {
     }
@@ -35,6 +36,12 @@ public class Sign implements Serializable {
         this.destination = destination;
         this.downloadUrl = downloadUrl;
         this.from = from;
+    }
+
+    public Sign(Place destination, Place from, String price) {
+        this.destination = destination;
+        this.from = from;
+        this.price = price;
     }
 
     public Place getDestination() {
@@ -65,6 +72,14 @@ public class Sign implements Serializable {
         return userUID;
     }
 
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
     public void setUserUID(String userUID) {
         this.userUID = userUID;
     }
@@ -76,6 +91,7 @@ public class Sign implements Serializable {
                 ", downloadUrl='" + downloadUrl + '\'' +
                 ", from=" + from +
                 ", userUID='" + userUID + '\'' +
+                ", price='" + price + '\'' +
                 '}';
     }
 }

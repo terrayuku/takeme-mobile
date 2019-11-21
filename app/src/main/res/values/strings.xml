@@ -58,5 +58,7 @@
     <string name="permission_location_rationale">Location permission is needed.</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="create_new_account">Create new account!</string>
+    <string name="price">Price</string>
+    <string name="randSign">R</string>
 
 </resources>

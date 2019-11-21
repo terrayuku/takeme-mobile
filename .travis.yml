@@ -44,6 +44,7 @@ deploy:
   on:
     tags: true
     branch: develop
+
 after_deploy:
 - rm -rf $TRAVIS_BUILD_DIR/app/build/outputs
 
