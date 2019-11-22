@@ -38,6 +38,7 @@ public class DisplaySignActivity extends AppCompatActivity {
     HashMap fm;
     HashMap dest;
     ProgressBar simpleProgressBar;
+    TextView price;
 
     private FirebaseAnalytics firebaseAnalytics;
     private Analytics analytics;
@@ -62,6 +63,7 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         final String from = intent.getStringExtra(MainActivity.FROM);
         final String destination = intent.getStringExtra(MainActivity.DESTINATION);
+        price = (TextView)findViewById(R.id.price);
 
         database = FirebaseDatabase.getInstance();
 
@@ -103,6 +105,7 @@ public class DisplaySignActivity extends AppCompatActivity {
         if (sign != null) if (sign.getDownloadUrl() != null) {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
             simpleProgressBar.setVisibility(View.GONE);
+            price.setText("R " + sign.getPrice());
             GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
         } else {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
@@ -125,10 +128,12 @@ public class DisplaySignActivity extends AppCompatActivity {
                 fm = (HashMap)d.child("from").getValue();
                 dest = (HashMap)d.child("destination").getValue();
                 String downloadUrl = d.child("downloadUrl").getValue(String.class);
+                String priceValue = d.child("price").getValue(String.class);
 
                 if (from.equalsIgnoreCase(fm.get("name").toString())) {
                     sign = new Sign();
                     sign.setDownloadUrl(downloadUrl);
+                    sign.setPrice(priceValue);
                 }
             }
             return sign;
@@ -149,9 +154,11 @@ public class DisplaySignActivity extends AppCompatActivity {
                     fm = (HashMap) d.child("from").getValue();
                     dest = (HashMap) d.child("destination").getValue();
                     String downloadUrl = d.child("downloadUrl").getValue(String.class);
+                    String priceValue = d.child("price").getValue(String.class);
 
                     if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
                         sign.setDownloadUrl(downloadUrl);
+                        sign.setPrice(priceValue);
                     }
                     analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
                 });
