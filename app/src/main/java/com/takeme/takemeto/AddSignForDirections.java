@@ -10,11 +10,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.icu.text.NumberFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 import android.util.Log;
 import android.widget.ProgressBar;
@@ -83,10 +86,10 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
     ProgressBar simpleProgressBar;
     public static final String TAG = "AddSignForDirections";
     private View mLayout;
+    private EditText priceValue;
 
 
     private static final int REQUEST_CAMERA = 0;
-
 
 
     @Override
@@ -95,13 +98,11 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         setContentView(R.layout.activity_add_sign_for_directions);
 
         mLayout = findViewById(R.id.message);
+        priceValue = (EditText) findViewById(R.id.price);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Camera permission has not been granted.
-
             requestCameraPermission();
-
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -115,8 +116,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         reference = FirebaseStorage.getInstance().getReference();
 
         mAuth = FirebaseAuth.getInstance();
-//        mAuth.signOut();
-//        signInAnonymously();
 
         if (!Places.isInitialized()) {
             Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
@@ -129,7 +128,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
                 getSupportFragmentManager().findFragmentById(R.id.to);
 
-        if(fromFragment != null && toFragment != null) {
+        if (fromFragment != null && toFragment != null) {
             // E/Places: Error while autocompleting: TIMEOU
             location.setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
@@ -205,7 +204,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_SHORT).show();
             }
-        }  else {
+        } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
@@ -237,8 +236,8 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
     }
 
     public void addSign(View view) {
-        if(destination != null && from != null && newImageView != null) {
-            if(currentPhotoPath != null && !currentPhotoPath.isEmpty()) {
+        if (destination != null && from != null && newImageView != null) {
+            if (currentPhotoPath != null && !currentPhotoPath.isEmpty()) {
                 uploadFile(currentPhotoPath);
             } else {
                 noImageCaptured();
@@ -279,7 +278,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
             @Override
             public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
                 try {
-                    double progress = (100 * taskSnapshot.getBytesTransferred()) / (double)taskSnapshot.getTotalByteCount();
+                    double progress = (100 * taskSnapshot.getBytesTransferred()) / (double) taskSnapshot.getTotalByteCount();
                     message.setText(getResources().getString(R.string.uploadPrefix) + " " + Math.round(progress) + " " + getResources().getString(R.string.uploadSurfix));
 
                     simpleProgressBar.setVisibility(View.VISIBLE);
@@ -302,7 +301,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                final Sign sign = new Sign(destination, from);
+                final Sign sign = new Sign(destination, from, priceValue.getText().toString());
 
                 if (mAuth.getCurrentUser() != null) {
 
@@ -421,7 +420,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         );
 
         // Save a file: path for use with ACTION_VIEW intents
-        if(!image.getAbsolutePath().isEmpty()) {
+        if (!image.getAbsolutePath().isEmpty()) {
             currentPhotoPath = image.getAbsolutePath();
             currentPhotoName = image.getName();
         } else {

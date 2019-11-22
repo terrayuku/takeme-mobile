@@ -117,6 +117,34 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.996" />
 
+    <EditText
+        android:id="@+id/price"
+        android:layout_width="130dp"
+        android:layout_height="71dp"
+        android:ems="10"
+        android:hint="@string/price"
+        android:inputType="numberDecimal|numberSigned"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/newImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.328"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from"
+        app:layout_constraintVertical_bias="0.362" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="49dp"
+        android:layout_height="62dp"
+        android:text="@string/randSign"
+        android:textSize="36sp"
+        app:layout_constraintBottom_toTopOf="@+id/newImage"
+        app:layout_constraintEnd_toStartOf="@+id/price"
+        app:layout_constraintHorizontal_bias="0.976"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from"
+        app:layout_constraintVertical_bias="0.401" />
+
     <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
         android:id="@+id/adDirectionsScreen"
         android:layout_width="717dp"
