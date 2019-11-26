@@ -23,11 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
 
-import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -38,13 +35,11 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.RectangularBounds;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.snackbar.Snackbar;
@@ -157,13 +152,10 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
     }
 
     private void requestCameraPermission() {
-        Log.i(TAG, "CAMERA permission has NOT been granted. Requesting permission.");
 
         // BEGIN_INCLUDE(camera_permission_request)
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.CAMERA)) {
-            Log.i(TAG,
-                    "Displaying camera permission rationale to provide additional context.");
             Snackbar.make(mLayout, R.string.permission_camera_rationale,
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, new View.OnClickListener() {
@@ -191,16 +183,13 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         if (requestCode == REQUEST_CAMERA) {
             // BEGIN_INCLUDE(permission_result)
             // Received permission result for camera permission.
-            Log.i(TAG, "Received response for Camera permission request.");
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission has been granted, preview can be displayed
-                Log.i(TAG, "CAMERA permission has now been granted. Showing preview.");
                 Snackbar.make(mLayout, R.string.permision_available_camera,
                         Snackbar.LENGTH_SHORT).show();
             } else {
-                Log.i(TAG, "CAMERA permission was NOT granted.");
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_SHORT).show();
             }
@@ -230,7 +219,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
         }).addOnFailureListener(this, new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Log.e("SIGNIN", "signInAnonymously:FAILURE", exception);
+                return;
             }
         });
     }
@@ -260,7 +249,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
             bmp.compress(Bitmap.CompressFormat.JPEG, 20, baos);
             data = baos.toByteArray();
         } catch (IOException e) {
-            Log.i("ERROR_COMPRESSING", reference.getName());
             e.printStackTrace();
         }
 //         Save the coordinates with the download url on db
@@ -271,7 +259,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                 .setCustomMetadata("destination", destination.getName())
                 .build();
 
-        Log.i("Reference", reference.getName());
         uploadTask = reference.child(BuildConfig.BUCKET + file.getLastPathSegment()).putBytes(data, metadata);
 
         uploadTask.addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -330,7 +317,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                     });
 
                 } else {
-                    Log.i("ERROR SAVING SIGN", mAuth.getCurrentUser().toString());
                     error();
                 }
             }
@@ -388,7 +374,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                 Uri photoURI = FileProvider.getUriForFile(this,
                         "com.takeme.takemeto.provider",
                         photoFile);
-                Log.i("PhotoUri", photoURI.getPath());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             } else {

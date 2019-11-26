@@ -106,7 +106,12 @@ public class DisplaySignActivity extends AppCompatActivity {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
             simpleProgressBar.setVisibility(View.GONE);
             price.setText("R " + sign.getPrice());
-            GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+            try {
+                GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+            } catch (Exception ise) {
+                error();
+            }
+
         } else {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
                     "SIGN WITH NO IMAGE, from " + from.toUpperCase() + " destination " + destination.toUpperCase());

@@ -48,7 +48,6 @@
 
         <activity
             android:name=".AddSignForDirections"
-            android:foregroundServiceType="location"
             android:label="Add Sign">
 
         </activity>
@@ -62,20 +61,14 @@
                 <data
                     android:host="takemeto.co.za"
                     android:scheme="http" />
+                <data android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
             android:name=".MainActivity"
-            android:foregroundServiceType="location"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
 
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".SplashActivity" android:theme="@style/SplashTheme">
             <intent-filter>
@@ -87,17 +80,10 @@
         </activity>
         <activity
             android:name=".LoginActivity"
-            android:foregroundServiceType="location"
             android:label="@string/app_name">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".AboutActivity"
-            android:foregroundServiceType="location"
             android:label="@string/about"
             android:theme="@style/AppTheme.NoActionBar" />
 
