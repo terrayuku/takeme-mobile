@@ -40,6 +40,7 @@
         app:layout_constraintVertical_bias="0.178"
         />
 
+<<<<<<< HEAD
 <!--    <EditText-->
 <!--        android:id="@+id/et_from"-->
 <!--        android:layout_width="wrap_content"-->
@@ -124,6 +125,8 @@
         <!--android:layout_centerHorizontal="true" />-->
 
 
+=======
+>>>>>>> b54929b6ee10f2fe213e06715d8e8568633aa4d5
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/findDirections"
         android:layout_width="wrap_content"
