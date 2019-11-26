@@ -175,12 +175,9 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     private void requestLocationPermission() {
-        Log.i(TAG, "LOCATION permission has NOT been granted. Requesting permission.");
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-            Log.i(TAG,
-                    "Displaying location permission rationale to provide additional context.");
             Snackbar.make(mLayout, R.string.permission_location_rationale,
                     Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.ok, new View.OnClickListener() {
@@ -208,16 +205,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         if (requestCode == REQUEST_LOCATION) {
             // BEGIN_INCLUDE(permission_result)
             // Received permission result for location permission.
-            Log.i(TAG, "Received response for LOCATION permission request.");
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission has been granted, preview can be displayed
-                Log.i(TAG, "LOCATION permission has now been granted. Showing preview.");
                 Snackbar.make(mLayout, R.string.permision_available_location,
                         Snackbar.LENGTH_SHORT).show();
             } else {
-                Log.i(TAG, "LOCATION permission was NOT granted.");
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_SHORT).show();
             }

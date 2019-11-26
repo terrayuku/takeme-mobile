@@ -33,6 +33,18 @@
         app:layout_constraintVertical_bias="0.363" />
 
 
+    <TextView
+        android:id="@+id/price"
+        android:layout_width="97dp"
+        android:layout_height="37dp"
+        android:text=""
+        app:layout_constraintBottom_toTopOf="@+id/adDisplayScreen"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        app:layout_constraintHorizontal_bias="0.809"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/directions_sign"
+        app:layout_constraintVertical_bias="0.197" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="135dp"

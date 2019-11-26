@@ -61,7 +61,6 @@ public class SettingsActivity extends AppCompatActivity {
                 displayName.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        Log.i("Edited", newValue.toString());
                         displayName.setText(newValue.toString());
                         UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder()
                                 .setDisplayName(newValue.toString())
@@ -71,7 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Log.i("USER", "SAVED");
+                                    return;
                                 }
                             }
                         });

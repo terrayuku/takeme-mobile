@@ -1,8 +1,5 @@
 package com.takeme.takemeto;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +7,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -106,7 +106,12 @@ public class DisplaySignActivity extends AppCompatActivity {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "Sign Found");
             simpleProgressBar.setVisibility(View.GONE);
             price.setText("R " + sign.getPrice());
-            GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+            try {
+                GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+            } catch (Exception ise) {
+                error();
+            }
+
         } else {
             analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity",
                     "SIGN WITH NO IMAGE, from " + from.toUpperCase() + " destination " + destination.toUpperCase());
