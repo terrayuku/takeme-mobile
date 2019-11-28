@@ -48,7 +48,8 @@
 
         <activity
             android:name=".AddSignForDirections"
-            android:label="Add Sign">
+            android:label="Add Sign"
+            android:windowSoftInputMode="adjustNothing">
 
         </activity>
         <activity android:name=".DisplaySignActivity">
