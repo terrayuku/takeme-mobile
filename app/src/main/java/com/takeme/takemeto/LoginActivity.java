@@ -191,6 +191,8 @@ public class LoginActivity extends AppCompatActivity {
                     login.setText("Login");
                     forgotPassword.setVisibility(View.VISIBLE);
                     signUp.setVisibility(View.VISIBLE);
+                    Snackbar snackbar = Snackbar.make(mLayout, "Thank you, Please check your email!", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }).addOnFailureListener(e -> {
             Snackbar snackbar = Snackbar.make(mLayout, "Failed to reset password, please try again!", Snackbar.LENGTH_LONG);
             snackbar.show();
