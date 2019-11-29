@@ -18,49 +18,48 @@
 
     <TextView
         android:id="@+id/snackbar_text"
-        android:layout_width="260dp"
-        android:layout_height="64dp"
+        android:layout_width="254dp"
+        android:layout_height="47dp"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.405"
+        app:layout_constraintHorizontal_bias="0.437"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minWidth="279dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="12dp"
+        android:minWidth="279dp"
         android:scaleType="centerCrop"
         android:src="@mipmap/taxi_layer"
         app:layout_constraintBottom_toTopOf="@+id/email"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.558"
+        app:layout_constraintHorizontal_bias="0.465"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0.07"
         tools:ignore="ContentDescription" />
 
     <EditText
         android:id="@+id/email"
-        android:layout_width="280dp"
-        android:layout_height="55dp"
+        android:layout_width="276dp"
+        android:layout_height="41dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:ems="10"
-        android:inputType="textEmailAddress"
         android:hint="Email"
+        android:inputType="textEmailAddress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintHorizontal_bias="0.512"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.395"
+        app:layout_constraintVertical_bias="0.326"
         tools:ignore="Autofill" />
 
     <EditText
@@ -79,34 +78,32 @@
     <EditText
         android:id="@+id/name"
         android:layout_width="136dp"
-        android:layout_height="50dp"
+        android:layout_height="38dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="64dp"
         android:ems="10"
         android:hint="Name"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toStartOf="@+id/surname"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/password"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar_login"
-        app:layout_constraintVertical_bias="0.894" />
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <EditText
         android:id="@+id/surname"
-        android:layout_width="136dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="133dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="68dp"
         android:ems="10"
         android:hint="Surname"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toEndOf="@+id/password"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar_login"
-        app:layout_constraintVertical_bias="0.894" />
-
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <TextView
         android:id="@+id/forgot_password_login"
@@ -134,7 +131,7 @@
         android:id="@+id/login"
         android:layout_width="279dp"
         android:layout_height="52dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="108dp"
         android:background="#4CAF50"
         android:text="Login"
         android:textColor="#FFFFFF"
