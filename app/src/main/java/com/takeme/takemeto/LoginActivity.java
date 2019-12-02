@@ -93,14 +93,15 @@ public class LoginActivity extends AppCompatActivity {
                     login.setText("Sign Up");
                     signUp.setText("Already have an account? Sign In!");
                 } else {
-                    isLogin = true;
-                    login.setText("Login");
-                    signUp.setText(getResources().getString(R.string.create_new_account));
-
-                    name.setVisibility(View.GONE);
-                    surname.setVisibility(View.GONE);
-
-                    forgotPassword.setVisibility(View.VISIBLE);
+//                    isLogin = true;
+//                    login.setText("Login");
+//                    signUp.setText(getResources().getString(R.string.create_new_account));
+//
+//                    name.setVisibility(View.GONE);
+//                    surname.setVisibility(View.GONE);
+//
+//                    forgotPassword.setVisibility(View.VISIBLE);
+                    loadLogin();
                 }
             }
         });
@@ -191,6 +192,8 @@ public class LoginActivity extends AppCompatActivity {
                     login.setText("Login");
                     forgotPassword.setVisibility(View.VISIBLE);
                     signUp.setVisibility(View.VISIBLE);
+                    Snackbar snackbar = Snackbar.make(mLayout, "Thank you, Please check your email!", Snackbar.LENGTH_LONG);
+                    snackbar.show();
                 }).addOnFailureListener(e -> {
             Snackbar snackbar = Snackbar.make(mLayout, "Failed to reset password, please try again!", Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -247,10 +250,15 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Snackbar snackbar = Snackbar.make(mLayout,
-                                            "User Created With " + email, Snackbar.LENGTH_LONG);
-                                    snackbar.show();
-                                    loadMainActivity();
+                                    auth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Snackbar snackbar = Snackbar.make(mLayout,
+                                                    "Please Verify Your email address " + email, Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                            loadMainActivity();
+                                        }
+                                    });
                                 }
                             }
                         });
@@ -295,8 +303,27 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadMainActivity() {
-        Intent findSignIntent = new Intent(this, MainActivity.class);
-        startActivity(findSignIntent);
+
+        if(!auth.getCurrentUser().isEmailVerified()) {
+            Snackbar snackbar = Snackbar.make(mLayout,
+                    "Please Verify Your email address ", Snackbar.LENGTH_LONG);
+            snackbar.show();
+            loadLogin();
+        } else {
+            Intent findSignIntent = new Intent(this, MainActivity.class);
+            startActivity(findSignIntent);
+        }
+    }
+
+    private void loadLogin() {
+        isLogin = true;
+        login.setText("Login");
+        signUp.setText(getResources().getString(R.string.create_new_account));
+
+        name.setVisibility(View.GONE);
+        surname.setVisibility(View.GONE);
+
+        forgotPassword.setVisibility(View.VISIBLE);
     }
 
     private void loadAdView() {

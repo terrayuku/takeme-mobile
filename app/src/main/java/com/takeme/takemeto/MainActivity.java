@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         initializePlaces();
 
-        if(auth.getCurrentUser() != null) {
+        if(auth.getCurrentUser() != null && auth.getCurrentUser().isEmailVerified()) {
             setContentView(R.layout.activity_main);
         } else {
             finish();
