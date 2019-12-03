@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
         initializePlaces();
 
-        if(auth.getCurrentUser() != null && auth.getCurrentUser().isEmailVerified()) {
+        if(auth.getCurrentUser() != null) {
             setContentView(R.layout.activity_main);
         } else {
             finish();
@@ -112,8 +112,14 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
-                    startActivity(addSingIntent);
+                    if(auth.getCurrentUser().isEmailVerified()) {
+                        analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
+                        startActivity(addSingIntent);
+                    } else {
+                        Snackbar.make(mLayout, R.string.emailVerification,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+
                 }
             });
         }
@@ -281,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items destination the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        System.out.println("About");
         return true;
     }
 
