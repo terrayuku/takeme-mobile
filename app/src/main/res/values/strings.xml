@@ -60,6 +60,6 @@
     <string name="create_new_account">Create new account!</string>
     <string name="price">Price</string>
     <string name="randSign">R</string>
-    <string name="emailVerification">Please verify your email address</string>
+    <string name="emailVerification">Please verify your email address, and re-login</string>
 
 </resources>

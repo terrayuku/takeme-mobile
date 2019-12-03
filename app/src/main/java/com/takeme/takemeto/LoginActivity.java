@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         signUp.setOnClickListener(v -> {
-            if (isFPassword){
+            if (isFPassword) {
                 isFPassword = false;
                 etPassword.setVisibility(View.VISIBLE);
                 login.setText("Login");
@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 forgotPassword.setVisibility(View.VISIBLE);
                 signUp.setText(getResources().getString(R.string.create_new_account));
-            }else {
+            } else {
                 if (isLogin) {
                     isLogin = false;
                     forgotPassword.setVisibility(View.GONE);
@@ -171,8 +171,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void resetPassword(String email){
-        if (email.isEmpty()){
+    private void resetPassword(String email) {
+        if (email.isEmpty()) {
             Snackbar snackbar = Snackbar.make(mLayout, "Please enter your Email", Snackbar.LENGTH_LONG);
             snackbar.show();
             return;
@@ -303,16 +303,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadMainActivity() {
-
-        if(!auth.getCurrentUser().isEmailVerified()) {
-            Snackbar snackbar = Snackbar.make(mLayout,
-                    "Please Verify Your email address ", Snackbar.LENGTH_LONG);
-            snackbar.show();
-            loadLogin();
-        } else {
-            Intent findSignIntent = new Intent(this, MainActivity.class);
-            startActivity(findSignIntent);
-        }
+        Intent findSignIntent = new Intent(this, MainActivity.class);
+        startActivity(findSignIntent);
     }
 
     private void loadLogin() {

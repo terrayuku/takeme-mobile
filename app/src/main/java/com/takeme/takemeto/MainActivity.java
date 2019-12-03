@@ -108,17 +108,20 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         final Intent addSingIntent = new Intent(this, AddSignForDirections.class);
 
         FloatingActionButton fab = findViewById(R.id.addDirections);
-        if(fab != null && auth.getCurrentUser().isEmailVerified()) {
+        if(fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
-                    startActivity(addSingIntent);
+                    if(auth.getCurrentUser().isEmailVerified()) {
+                        analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
+                        startActivity(addSingIntent);
+                    } else {
+                        Snackbar.make(mLayout, R.string.emailVerification,
+                                Snackbar.LENGTH_SHORT).show();
+                    }
+
                 }
             });
-        } else {
-            Snackbar.make(mLayout, R.string.emailVerification,
-                    Snackbar.LENGTH_SHORT).show();
         }
 
         AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
