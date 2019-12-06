@@ -9,7 +9,7 @@
     <ProgressBar
         android:id="@+id/progress_bar_login"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="48dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,7 @@
     <TextView
         android:id="@+id/forgot_password_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:padding="8dp"
         android:text="@string/forgot_password"
         android:textColor="@color/colorPrimary"
@@ -81,7 +81,7 @@
     <TextView
         android:id="@+id/sign_up_text_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:padding="8dp"
         android:text="@string/create_new_account"
         android:textColor="@color/colorPrimary"

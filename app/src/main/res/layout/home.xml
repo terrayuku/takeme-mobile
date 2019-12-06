@@ -19,7 +19,7 @@
     <TextView
         android:id="@+id/snackbar_text"
         android:layout_width="254dp"
-        android:layout_height="47dp"
+        android:layout_height="48dp"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.437"
@@ -46,7 +46,7 @@
     <EditText
         android:id="@+id/email"
         android:layout_width="276dp"
-        android:layout_height="41dp"
+        android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -65,7 +65,7 @@
     <EditText
         android:id="@+id/password"
         android:layout_width="279dp"
-        android:layout_height="49dp"
+        android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
@@ -78,7 +78,7 @@
     <EditText
         android:id="@+id/name"
         android:layout_width="136dp"
-        android:layout_height="38dp"
+        android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="64dp"
@@ -95,7 +95,7 @@
     <EditText
         android:id="@+id/surname"
         android:layout_width="133dp"
-        android:layout_height="38dp"
+        android:layout_height="48dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="4dp"
         android:layout_marginBottom="68dp"
@@ -109,7 +109,7 @@
     <TextView
         android:id="@+id/forgot_password_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:text="@string/forgot_password"
         android:textColor="@color/colorPrimary"
@@ -120,7 +120,7 @@
     <TextView
         android:id="@+id/sign_up_text_login"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:text="@string/create_new_account"
         android:textColor="@color/colorPrimary"
@@ -136,6 +136,7 @@
         android:background="#4CAF50"
         android:text="Login"
         android:textColor="#FFFFFF"
+        app:layout_constraintDimensionRatio="4.50"
         app:layout_constraintEnd_toEndOf="@+id/email"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/email"

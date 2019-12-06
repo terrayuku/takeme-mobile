@@ -36,7 +36,7 @@
     <TextView
         android:id="@+id/price"
         android:layout_width="97dp"
-        android:layout_height="37dp"
+        android:layout_height="38dp"
         android:text=""
         app:layout_constraintBottom_toTopOf="@+id/adDisplayScreen"
         app:layout_constraintEnd_toStartOf="@+id/imageView"
