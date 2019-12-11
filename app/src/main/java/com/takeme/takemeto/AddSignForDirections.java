@@ -302,7 +302,7 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
                             sign.setDownloadUrl(uri.toString());
                             sign.setUserUID(mAuth.getCurrentUser().getUid());
 
-                            databaseReference.child(sign.getDestination().getName().toUpperCase()).push().setValue(sign).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            databaseReference.child(sign.getDestination().getName().toUpperCase()).push().setValue(sign.toMap()).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     success();

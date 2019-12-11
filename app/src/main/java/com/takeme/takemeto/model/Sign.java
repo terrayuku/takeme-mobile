@@ -1,9 +1,14 @@
 package com.takeme.takemeto.model;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Sign implements Serializable {
     Place destination;
     String downloadUrl;
@@ -82,6 +87,18 @@ public class Sign implements Serializable {
 
     public void setUserUID(String userUID) {
         this.userUID = userUID;
+    }
+
+    @Exclude
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("destination", destination);
+        result.put("from", from);
+        result.put("price", price);
+        result.put("userUID", userUID);
+        result.put("downloadUrl", downloadUrl);
+
+        return result;
     }
 
     @Override
