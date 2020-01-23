@@ -12,7 +12,7 @@
     <string name="upload_sign">Upload Sign</string>
     <string name="location_error">"Could not get location"</string>
 
-    <string name="banner_ad_unit_id">ca-app-pub-1696018568424604~9355875062</string>
+    <string name="banner_ad_unit_id">ca-app-pub-1696018568424604/9242472224</string>
     <string name="banner_ad_unit_id_test">ca-app-pub-3940256099942544/6300978111</string>
     <string name="noValidDirections">Please enter valid direction</string>
     <string name="noImageCaptured">Please make sure you take a photo of the hand sign to use</string>

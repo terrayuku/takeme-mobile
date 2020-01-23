@@ -189,7 +189,6 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         mAdView = findViewById(R.id.adDisplayScreen);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
         analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Load Add", "DisplaySignActivity",

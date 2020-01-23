@@ -250,7 +250,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         });
 
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         try {
             mAdView.loadAd(adRequest);

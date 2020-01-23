@@ -333,7 +333,6 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
 
         mAdView = findViewById(R.id.adDirectionsScreen);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
     }
