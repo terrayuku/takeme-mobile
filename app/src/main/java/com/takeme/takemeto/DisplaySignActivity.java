@@ -24,7 +24,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.model.Sign;
-import com.takeme.takemeto.module.GlideApp;
 
 import java.util.HashMap;
 
@@ -108,7 +107,7 @@ public class DisplaySignActivity extends AppCompatActivity {
                 price.setText("R " + sign.getPrice());
             }
             try {
-                GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
+//                GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
                 simpleProgressBar.setVisibility(View.GONE);
             } catch (Exception ise) {
                 error();
@@ -189,7 +188,7 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         mAdView = findViewById(R.id.adDisplayScreen);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addKeyword(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
         analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Load Add", "DisplaySignActivity",

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,14 +11,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.crashlytics.android.Crashlytics;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth auth;
@@ -39,14 +38,14 @@ public class LoginActivity extends AppCompatActivity {
     private boolean isFPassword = false;
     private TextView signUp, forgotPassword;
     private EditText etPassword, etEmail, name, surname;
-    Button login;
+    private TextInputLayout nameLayout, surnameLayout, passwordLayout;
+    MaterialButton login;
     AdView mAdView;
     View mLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.home);
 
         auth = FirebaseAuth.getInstance();
@@ -59,13 +58,16 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.password);
         name = findViewById(R.id.name);
         surname = findViewById(R.id.surname);
+        nameLayout = findViewById(R.id.name_layout);
+        surnameLayout = findViewById(R.id.surname_layout);
+        passwordLayout = findViewById(R.id.password_layout);
 
-        name.setVisibility(View.GONE);
-        surname.setVisibility(View.GONE);
+        nameLayout.setVisibility(View.GONE);
+        surnameLayout.setVisibility(View.GONE);
 
         forgotPassword.setOnClickListener(v -> {
             isFPassword = true;
-            etPassword.setVisibility(View.GONE);
+            passwordLayout.setVisibility(View.GONE);
             login.setText("Reset password");
             forgotPassword.setVisibility(View.GONE);
             signUp.setText("Go to Login");
@@ -74,11 +76,11 @@ public class LoginActivity extends AppCompatActivity {
         signUp.setOnClickListener(v -> {
             if (isFPassword) {
                 isFPassword = false;
-                etPassword.setVisibility(View.VISIBLE);
+                passwordLayout.setVisibility(View.VISIBLE);
                 login.setText("Login");
 
-                name.setVisibility(View.GONE);
-                surname.setVisibility(View.GONE);
+                nameLayout.setVisibility(View.GONE);
+                surnameLayout.setVisibility(View.GONE);
 
                 forgotPassword.setVisibility(View.VISIBLE);
                 signUp.setText(getResources().getString(R.string.create_new_account));
@@ -87,20 +89,12 @@ public class LoginActivity extends AppCompatActivity {
                     isLogin = false;
                     forgotPassword.setVisibility(View.GONE);
 
-                    name.setVisibility(View.VISIBLE);
-                    surname.setVisibility(View.VISIBLE);
+                    nameLayout.setVisibility(View.VISIBLE);
+                    surnameLayout.setVisibility(View.VISIBLE);
 
                     login.setText("Sign Up");
                     signUp.setText("Already have an account? Sign In!");
                 } else {
-//                    isLogin = true;
-//                    login.setText("Login");
-//                    signUp.setText(getResources().getString(R.string.create_new_account));
-//
-//                    name.setVisibility(View.GONE);
-//                    surname.setVisibility(View.GONE);
-//
-//                    forgotPassword.setVisibility(View.VISIBLE);
                     loadLogin();
                 }
             }
@@ -188,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().sendPasswordResetEmail(email)
                 .addOnSuccessListener(aVoid -> {
                     isFPassword = false;
-                    etPassword.setVisibility(View.VISIBLE);
+                    passwordLayout.setVisibility(View.VISIBLE);
                     login.setText("Login");
                     forgotPassword.setVisibility(View.VISIBLE);
                     signUp.setVisibility(View.VISIBLE);
@@ -312,8 +306,8 @@ public class LoginActivity extends AppCompatActivity {
         login.setText("Login");
         signUp.setText(getResources().getString(R.string.create_new_account));
 
-        name.setVisibility(View.GONE);
-        surname.setVisibility(View.GONE);
+        nameLayout.setVisibility(View.GONE);
+        surnameLayout.setVisibility(View.GONE);
 
         forgotPassword.setVisibility(View.VISIBLE);
     }
@@ -325,7 +319,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAdView = findViewById(R.id.adMain);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addKeyword(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         mAdView.loadAd(adRequest);
     }

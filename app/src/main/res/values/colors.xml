@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#2e7d32</color>
-    <color name="colorPrimaryDark">#2e7d32</color>
-    <color name="colorAccent">#D81B60</color>
+    <!-- Primary palette — modern green -->
+    <color name="colorPrimary">#1B5E20</color>
+    <color name="colorPrimaryDark">#003300</color>
+    <color name="colorPrimaryLight">#4C8C4A</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+
+    <!-- Secondary palette -->
+    <color name="colorSecondary">#00897B</color>
+    <color name="colorSecondaryDark">#005B4F</color>
+    <color name="colorOnSecondary">#FFFFFF</color>
+
+    <!-- Accent / Tertiary -->
+    <color name="colorAccent">#00897B</color>
+
+    <!-- Surface & Background -->
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#F5F5F5</color>
+    <color name="colorBackground">#FAFAFA</color>
+    <color name="colorOnSurface">#1C1B1F</color>
+    <color name="colorOnSurfaceVariant">#49454F</color>
+
+    <!-- Error -->
+    <color name="colorError">#B3261E</color>
+    <color name="colorOnError">#FFFFFF</color>
+
+    <!-- Outline -->
+    <color name="colorOutline">#79747E</color>
+    <color name="colorOutlineVariant">#CAC4D0</color>
+
+    <!-- Misc -->
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textHint">#9E9E9E</color>
+    <color name="divider">#E0E0E0</color>
+    <color name="ripple">#1F1B5E20</color>
+    <color name="scrim">#52000000</color>
+
+    <!-- Status colors -->
+    <color name="success">#2E7D32</color>
+    <color name="warning">#F9A825</color>
+    <color name="info">#0288D1</color>
+
+    <!-- Countdown -->
+    <color name="countdownNormal">#1B5E20</color>
+    <color name="countdownUrgent">#E65100</color>
+    <color name="countdownCritical">#B3261E</color>
 </resources>
