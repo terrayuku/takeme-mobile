@@ -275,10 +275,14 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
+        if (BuildConfig.DEBUG) {
+            // Skip authentication entirely in debug builds
+            loadMainActivity();
+            return;
+        }
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
-            // Already signed in
             loadMainActivity();
         }
     }

@@ -11,6 +11,7 @@ public class Analytics {
 
     public void setAnalytics(FirebaseAnalytics analytics, String name, String id, String message) {
         this.analytics = analytics;
+        if (analytics == null) return;
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, id);
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);

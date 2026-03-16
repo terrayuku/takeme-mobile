@@ -18,9 +18,9 @@ import java.util.UUID;
  */
 public class TripControllerImpl implements TripController {
 
-    static final String REMOTE_CONFIG_RATE_KEY = "rate_per_km";
-    static final double DEFAULT_RATE_PER_KM = 2.5;
-    static final int MAX_PAYMENT_ATTEMPTS = 3;
+    public static final String REMOTE_CONFIG_RATE_KEY = "rate_per_km";
+    public static final double DEFAULT_RATE_PER_KM = 2.5;
+    public static final int MAX_PAYMENT_ATTEMPTS = 3;
     static final double ARRIVAL_THRESHOLD_METRES = 50.0;
 
     private final FirebaseDatabase database;
@@ -104,7 +104,7 @@ public class TripControllerImpl implements TripController {
      * exponential backoff (1 s, 2 s, 4 s). After exhaustion, flags the trip
      * and writes a PAYMENT_FAILURE fleet event (req 6.3.1, 6.3.2).
      */
-    void retryPayment(Trip trip) {
+    protected void retryPayment(Trip trip) {
         long[] backoffMs = {1000L, 2000L, 4000L};
 
         for (int attempt = 0; attempt < MAX_PAYMENT_ATTEMPTS; attempt++) {

@@ -103,13 +103,33 @@ public class BoardingConfirmationActivity extends AppCompatActivity {
                 intent.putExtra(EXTRA_TRIP_ID, tripId);
             }
             startActivity(intent);
+
+            // Launch multi-commuter check-in flow after boarding confirmation (req 1.1.1)
+            launchCommuterCheckIn();
+
             finish();
         }).addOnFailureListener(e -> {
             // Even if tripId fetch fails, navigate forward without it
             Intent intent = new Intent(this, DestinationSelectionActivity.class);
             startActivity(intent);
+
+            // Launch multi-commuter check-in flow after boarding confirmation (req 1.1.1)
+            launchCommuterCheckIn();
+
             finish();
         });
+    }
+
+    /**
+     * Launches CommuterCheckInActivity to begin the multi-commuter boarding flow
+     * after the initial single-passenger boarding confirmation completes (req 1.1.1).
+     */
+    private void launchCommuterCheckIn() {
+        if (vehicleId != null) {
+            Intent checkInIntent = new Intent(this, CommuterCheckInActivity.class);
+            checkInIntent.putExtra(CommuterCheckInActivity.EXTRA_VEHICLE_ID, vehicleId);
+            startActivity(checkInIntent);
+        }
     }
 
     /** Called when the 60-second countdown expires without confirmation. */

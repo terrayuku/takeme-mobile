@@ -8,9 +8,8 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <fragment
+    <FrameLayout
         android:id="@+id/from"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         android:layout_width="454dp"
         android:layout_height="102dp"
         android:layout_marginStart="8dp"
@@ -24,9 +23,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.245" />
 
-    <fragment
+    <FrameLayout
         android:id="@+id/destination"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         android:layout_width="452dp"
         android:layout_height="113dp"
         android:layout_marginStart="8dp"

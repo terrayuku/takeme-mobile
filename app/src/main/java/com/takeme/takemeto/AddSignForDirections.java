@@ -186,9 +186,10 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
 
             // Check if the only required permission has been granted
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Camera permission has been granted, preview can be displayed
+                // Camera permission has been granted, launch camera
                 Snackbar.make(mLayout, R.string.permision_available_camera,
                         Snackbar.LENGTH_SHORT).show();
+                dispatchTakePictureIntent();
             } else {
                 Snackbar.make(mLayout, R.string.permissions_not_granted,
                         Snackbar.LENGTH_SHORT).show();
@@ -205,9 +206,12 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
     }
 
     public void uploadSign(View view) {
-        dispatchTakePictureIntent();
-        galleryAddPic();
-        setPic();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestCameraPermission();
+        } else {
+            dispatchTakePictureIntent();
+        }
     }
 
     private void signInAnonymously() {
@@ -383,6 +387,8 @@ public class AddSignForDirections extends AppCompatActivity implements ActivityC
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            galleryAddPic();
+            setPic();
             Glide.with(this).load(currentPhotoPath).into(newImageView);
         }
     }

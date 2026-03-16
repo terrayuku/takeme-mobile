@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/screen_padding_horizontal">
+
+    <!-- Alight button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_alight"
+        style="@style/Widget.Takeme.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginBottom="@dimen/spacing_xl"
+        android:text="Alight" />
+
+    <!-- Fare card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_xl"
+        android:visibility="gone"
+        app:cardCornerRadius="@dimen/card_radius"
+        app:cardElevation="@dimen/elevation_low"
+        app:contentPadding="@dimen/spacing_lg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- Fare label -->
+            <TextView
+                android:id="@+id/tv_fare_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_sm"
+                android:text="Your fare"
+                android:textAppearance="@style/TextAppearance.Takeme.Subtitle" />
+
+            <!-- Fare amount -->
+            <TextView
+                android:id="@+id/tv_fare_amount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="48sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Status message -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_md"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Takeme.Body"
+        android:visibility="gone" />
+
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/spacing_md"
+        android:indeterminateTint="@color/colorPrimary"
+        android:visibility="gone" />
+
+    <!-- Pay button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_pay"
+        style="@style/Widget.Takeme.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height"
+        android:text="Pay Now"
+        android:visibility="gone" />
+
+</LinearLayout>

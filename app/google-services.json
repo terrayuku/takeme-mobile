@@ -23,8 +23,12 @@
           }
         },
         {
-          "client_id": "434060467469-fp57pvalg169blkbuoqeft9t1b5j3s8l.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "434060467469-hhmjmj3vcdjdbnbuh4bvb8eppklnfr2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.takeme.takemeto",
+            "certificate_hash": "10ffc5b2342b32da6ffe026b73758e8e6e025c64"
+          }
         }
       ],
       "api_key": [
@@ -34,12 +38,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "434060467469-fp57pvalg169blkbuoqeft9t1b5j3s8l.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       },
       "admob_app_id": "ca-app-pub-1696018568424604~9355875062"

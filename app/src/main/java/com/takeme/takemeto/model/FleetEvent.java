@@ -14,7 +14,11 @@ public class FleetEvent {
         PAYMENT_FAILURE,
         FPS_WARNING,
         INFERENCE_ERROR,
-        TRIP_CREATE_ERROR
+        TRIP_CREATE_ERROR,
+        // Multi-commuter boarding & fare enforcement
+        FARE_EVASION_ALERT,
+        FARE_EVASION_RESOLVED,
+        SENSOR_FAILURE
     }
 
     private String eventId;

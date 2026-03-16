@@ -105,7 +105,7 @@ public class TripControllerTest {
         // Subclass that skips Thread.sleep so the test runs instantly.
         TripControllerImpl fastController = new TripControllerImpl(mockDatabase, mockRemoteConfig) {
             @Override
-            void retryPayment(Trip t) {
+            protected void retryPayment(Trip t) {
                 for (int i = 0; i < MAX_PAYMENT_ATTEMPTS; i++) {
                     t.setPaymentAttempts(t.getPaymentAttempts() + 1);
                 }

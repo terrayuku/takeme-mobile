@@ -1,8 +1,8 @@
 package com.takeme.takemeto;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -16,6 +16,14 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import android.graphics.drawable.Drawable;
+
+import androidx.annotation.Nullable;
+
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -24,18 +32,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.model.Sign;
+import com.takeme.takemeto.module.GlideApp;
 
 import java.util.HashMap;
 
 public class DisplaySignActivity extends AppCompatActivity {
+    private static final String TAG = "DisplaySign";
     public static final String THANKYOU = "com.takeme.takemeto.THANKYOU";
     public static final String SIGN_NOT_FOUND = "com.takeme.takemeto.SIGN_NOT_FOUND";
     public static final String SIGN_COULD_NOT_BE_SHARED = "com.takeme.takemeto.SIGN_COULD_NOT_BE_SHARED";
     DatabaseReference databaseReference;
     FirebaseDatabase database;
     AdView mAdView;
-    HashMap fm;
-    HashMap dest;
     ProgressBar simpleProgressBar;
     TextView price;
 
@@ -70,29 +78,41 @@ public class DisplaySignActivity extends AppCompatActivity {
 
         simpleProgressBar.setVisibility(View.VISIBLE);
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        // Signs are stored under signs/{DESTINATION_NAME_UPPERCASE}/{pushKey}
+        String destKey = destination != null ? destination.toUpperCase() : "";
+
+        String dbPath = BuildConfig.DB + "/" + destKey;
+        Log.d(TAG, "from='" + from + "' destination='" + destination + "'");
+        Log.d(TAG, "Querying Firebase path: " + dbPath);
+
+        databaseReference.child(destKey)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Sign sign = null;
+            public void onDataChange(@NonNull DataSnapshot destinationSnapshot) {
+                Log.d(TAG, "onDataChange: exists=" + destinationSnapshot.exists()
+                        + " childrenCount=" + destinationSnapshot.getChildrenCount()
+                        + " key=" + destinationSnapshot.getKey());
 
-
-                analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions", "DisplaySignActivity", "DisplaySignActivity Get Directions");
-                // Get Image
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    sign = getSignForHigherSDKVersion(from, destination, dataSnapshot);
-                } else {
-                    sign = getSign(from, destination, dataSnapshot);
-                }
-
-                // Display Image
+                Sign sign = findSign(from, destinationSnapshot);
+                Log.d(TAG, "findSign result: " + (sign != null ? "FOUND url=" + sign.getDownloadUrl() : "NOT FOUND"));
                 displaySign(from, destination, sign);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                Log.e(TAG, "onCancelled: " + databaseError.getMessage());
+                simpleProgressBar.setVisibility(View.GONE);
+                signNotFound();
             }
         });
+
+        // Timeout — if Firebase hasn't responded in 8 seconds, show not found
+        simpleProgressBar.postDelayed(() -> {
+            if (simpleProgressBar.getVisibility() == View.VISIBLE) {
+                simpleProgressBar.setVisibility(View.GONE);
+                signNotFound();
+            }
+        }, 8000);
         TextView directionSign = findViewById(R.id.directions_sign);
         directionSign.setText(message);
     }
@@ -107,8 +127,26 @@ public class DisplaySignActivity extends AppCompatActivity {
                 price.setText("R " + sign.getPrice());
             }
             try {
-//                GlideApp.with(imageView.getContext()).load(sign.getDownloadUrl()).into(imageView);
-                simpleProgressBar.setVisibility(View.GONE);
+                simpleProgressBar.setVisibility(View.VISIBLE);
+                GlideApp.with(imageView.getContext())
+                        .load(sign.getDownloadUrl())
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                    Target<Drawable> target, boolean isFirstResource) {
+                                simpleProgressBar.setVisibility(View.GONE);
+                                error();
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model,
+                                    Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                simpleProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(imageView);
             } catch (Exception ise) {
                 error();
             }
@@ -125,55 +163,24 @@ public class DisplaySignActivity extends AppCompatActivity {
         }
     }
 
-    private Sign getSign(String from, String destination, DataSnapshot dataSnapshot) {
-        Sign sign = new Sign();
-
+    /**
+     * Searches entries under the destination node for one matching the given 'from' name.
+     * DB structure: signs/{DEST_UPPERCASE}/{pushKey}/from/name
+     */
+    private Sign findSign(String from, DataSnapshot destinationSnapshot) {
         try {
-            for (DataSnapshot d : dataSnapshot.child(destination.toUpperCase()).getChildren()) {
-
-                fm = (HashMap)d.child("from").getValue();
-                dest = (HashMap)d.child("destination").getValue();
-                String downloadUrl = d.child("downloadUrl").getValue(String.class);
-                String priceValue = d.child("price").getValue(String.class);
-
-                if (from.equalsIgnoreCase(fm.get("name").toString())) {
-                    sign = new Sign();
-                    sign.setDownloadUrl(downloadUrl);
-                    sign.setPrice(priceValue);
+            for (DataSnapshot entry : destinationSnapshot.getChildren()) {
+                String fromName = entry.child("from").child("name").getValue(String.class);
+                Log.d(TAG, "  entry=" + entry.getKey() + " from/name='" + fromName + "' looking for='" + from + "'");
+                if (fromName != null && from.equalsIgnoreCase(fromName)) {
+                    Sign sign = new Sign();
+                    sign.setDownloadUrl(entry.child("downloadUrl").getValue(String.class));
+                    sign.setPrice(entry.child("price").getValue(String.class));
+                    return sign;
                 }
             }
-            return sign;
-
-        } catch (ClassCastException cast) {
-            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
-                    cast.getMessage());
-        }
-        return null;
-    }
-
-    private Sign getSignForHigherSDKVersion(String from, String destination, DataSnapshot dataSnapshot) {
-        Sign sign = new Sign();
-
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                dataSnapshot.child(destination.toUpperCase()).getChildren().forEach(d -> {
-                    fm = (HashMap) d.child("from").getValue();
-                    dest = (HashMap) d.child("destination").getValue();
-                    String downloadUrl = d.child("downloadUrl").getValue(String.class);
-                    String priceValue = d.child("price").getValue(String.class);
-
-                    if (from.toUpperCase().equalsIgnoreCase(fm.get("name").toString())) {
-                        sign.setDownloadUrl(downloadUrl);
-                        sign.setPrice(priceValue);
-                    }
-                    analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Directions Found", "DisplaySignActivity", "DisplaySignActivity Directions Found");
-                });
-            }
-            return sign;
-
-        } catch (ClassCastException cast) {
-            analytics.setAnalytics(firebaseAnalytics, "DisplaySignActivity Get Directions ClassCastException", "DisplaySignActivity Get Directions",
-                    cast.getMessage());
+        } catch (Exception e) {
+            Log.e(TAG, "findSign error", e);
         }
         return null;
     }

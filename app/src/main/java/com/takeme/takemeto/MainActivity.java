@@ -11,20 +11,28 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.RectangularBounds;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.takeme.takemeto.impl.Analytics;
 import com.takeme.takemeto.impl.Location;
+import com.takeme.takemeto.impl.PlacesAutoCompleteAdapter;
+import com.takeme.takemeto.model.CommuterTrip;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,25 +45,39 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.LayoutInflater;
+import android.widget.LinearLayout;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
     public static final String EXTRA_MESSAGE = "com.takeme.takemeto.MESSAGE";
     public static final String FROM = "com.takeme.takemeto.FROM";
     public static final String DESTINATION = "com.takeme.takemeto.DESTINATION";
     TextView thankyou;
-    FloatingActionButton findDirections;
+    ExtendedFloatingActionButton findDirections;
     private AdView mAdView;
 
-    Place from;
-    Place destination;
+    private PlacesClient placesClient;
+    private String fromName;
+    private String destinationName;
     private FirebaseAnalytics firebaseAnalytics;
     private Analytics analytics;
     private FirebaseAuth auth;
     Location location;
+
+    // Commuter trip history (req 6.3.2)
+    private LinearLayout tripHistoryContainer;
+    private TextView tripHistoryLabel;
+    private TextView noTripsText;
+    private Query commuterTripsQuery;
+    private ValueEventListener commuterTripsListener;
 
     public static final String TAG = "MainActivity";
     private View mLayout;
@@ -68,20 +90,28 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         super.onCreate(savedInstanceState);
         auth = FirebaseAuth.getInstance();
 
-        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
-        analytics = new Analytics();
-        analytics.setAnalytics(firebaseAnalytics, "App Open", "App Open", "App Open");
-
-        initializePlaces();
-
-        if(auth.getCurrentUser() != null) {
-            setContentView(R.layout.activity_main);
-        } else {
+        if (!BuildConfig.DEBUG && auth.getCurrentUser() == null) {
+            loadLoginActivity();
             finish();
+            return;
         }
 
+        setContentView(R.layout.activity_main);
+
+        try {
+            firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+            analytics = new Analytics();
+            analytics.setAnalytics(firebaseAnalytics, "App Open", "App Open", "App Open");
+        } catch (Exception e) {
+            // Analytics may fail in debug without full Firebase setup
+            analytics = new Analytics();
+        }
+
+        initializePlaces();
+        placesClient = Places.createClient(this);
+
         mAdView = findViewById(R.id.adMain);
-        findDirections = (FloatingActionButton) findViewById(R.id.findDirections);
+        findDirections = (ExtendedFloatingActionButton) findViewById(R.id.findDirections);
         thankyou = (TextView) findViewById(R.id.thankyou);
         mLayout = thankyou;
 
@@ -98,6 +128,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             requestLocationPermission();
         }
 
+        // Commuter trip history (req 6.3.2)
+        tripHistoryLabel = findViewById(R.id.tv_trip_history_label);
+        tripHistoryContainer = findViewById(R.id.trip_history_container);
+        noTripsText = findViewById(R.id.tv_no_trips);
+        loadCommuterTripHistory();
+
         final Intent addSingIntent = new Intent(this, AddSignForDirections.class);
 
         FloatingActionButton fab = findViewById(R.id.addDirections);
@@ -105,7 +141,12 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(auth.getCurrentUser().isEmailVerified()) {
+                    FirebaseUser user = auth.getCurrentUser();
+                    if(user != null && user.isEmailVerified()) {
+                        analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
+                        startActivity(addSingIntent);
+                    } else if (BuildConfig.DEBUG) {
+                        // Allow in debug without email verification
                         analytics.setAnalytics(firebaseAnalytics, "Add Sign", "Add", "Add Sign");
                         startActivity(addSingIntent);
                     } else {
@@ -117,40 +158,24 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             });
         }
 
-        AutocompleteSupportFragment toFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.destination);
+        // Inline autocomplete setup
+        PlacesAutoCompleteAdapter fromAdapter = new PlacesAutoCompleteAdapter(this, placesClient);
+        PlacesAutoCompleteAdapter toAdapter = new PlacesAutoCompleteAdapter(this, placesClient);
 
-        AutocompleteSupportFragment fromFragment = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.from);
+        AutoCompleteTextView fromInput = findViewById(R.id.from);
+        AutoCompleteTextView toInput = findViewById(R.id.destination);
 
-        if(fromFragment != null && toFragment != null) {
-            // E/Places: Error while autocompleting: TIMEOU
-            location.setPlace(fromFragment, "From...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                @Override
-                public void onPlaceSelected(Place place) {
-                    analytics.setAnalytics(firebaseAnalytics, "From", fromFragment.getTag(), "Place Found");
-                    from = place;
-                }
+        fromInput.setAdapter(fromAdapter);
+        fromInput.setOnItemClickListener((parent, view, position, id) -> {
+            fromName = fromAdapter.getItem(position).getPrimaryText(null).toString();
+            analytics.setAnalytics(firebaseAnalytics, "From", fromName, "Place Found");
+        });
 
-                @Override
-                public void onError(@NonNull Status status) {
-                    analytics.setAnalytics(firebaseAnalytics, "From", fromFragment.getTag(), "Place Not Found");
-                }
-            });
-
-            location.setPlace(toFragment, "To...").setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                @Override
-                public void onPlaceSelected(Place place) {
-                    analytics.setAnalytics(firebaseAnalytics, "To", toFragment.getTag(), "Place Found");
-                    destination = place;
-                }
-
-                @Override
-                public void onError(@NonNull Status status) {
-                    analytics.setAnalytics(firebaseAnalytics, "To", toFragment.getTag(), "Place Not Found");
-                }
-            });
-        }
+        toInput.setAdapter(toAdapter);
+        toInput.setOnItemClickListener((parent, view, position, id) -> {
+            destinationName = toAdapter.getItem(position).getPrimaryText(null).toString();
+            analytics.setAnalytics(firebaseAnalytics, "To", destinationName, "Place Found");
+        });
 
         loadAdView();
 
@@ -158,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     private void initializePlaces() {
         if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key));
+            Places.initialize(getApplicationContext(), getResources().getString(R.string.maps_key).trim());
         }
     }
 
@@ -222,10 +247,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     @Override
     public void onStart() {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if(currentUser == null) {
-            // Already signed in
+        if (!BuildConfig.DEBUG && auth.getCurrentUser() == null) {
             loadLoginActivity();
         }
     }
@@ -305,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     public void findSingButton(View view) {
         Intent findSignIntent = new Intent(this, DisplaySignActivity.class);
 
-        if (from == null || destination == null) {
+        if (fromName == null || fromName.isEmpty() || destinationName == null || destinationName.isEmpty()) {
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(getResources().getString(R.string.noValidDirections));
             spannableStringBuilder.setSpan(
                     new ForegroundColorSpan(Color.RED),
@@ -316,11 +338,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
             thankyou.setText(spannableStringBuilder);
             analytics.setAnalytics(firebaseAnalytics, "Directions", "Directions", "No Valid Directions Entered");
         } else {
-            String message = "From " + from.getName() + " To " + destination.getName();
+            String message = "From " + fromName + " To " + destinationName;
             analytics.setAnalytics(firebaseAnalytics, "Directions", "Directions", "Search Directions Entered");
             findSignIntent.putExtra(EXTRA_MESSAGE, message);
-            findSignIntent.putExtra(DESTINATION, destination.getName());
-            findSignIntent.putExtra(FROM, from.getName());
+            findSignIntent.putExtra(DESTINATION, destinationName);
+            findSignIntent.putExtra(FROM, fromName);
             startActivity(findSignIntent);
         }
 
@@ -328,6 +350,78 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     private void error() {
         thankyou.setText(getResources().getString(R.string.genericFailure));
+    }
+
+    /**
+     * Loads commuter trip history from Firebase RTDB filtered by the current
+     * user's UID. Displays trips in the trip history container (req 6.3.2).
+     */
+    private void loadCommuterTripHistory() {
+        FirebaseUser user = auth.getCurrentUser();
+        if (user == null) return;
+
+        String currentUserUid = user.getUid();
+        commuterTripsQuery = FirebaseDatabase.getInstance()
+                .getReference("commuter_trips")
+                .orderByChild("commuterUid")
+                .equalTo(currentUserUid);
+
+        commuterTripsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                tripHistoryLabel.setVisibility(View.VISIBLE);
+                tripHistoryContainer.removeAllViews();
+
+                if (!snapshot.exists() || !snapshot.hasChildren()) {
+                    tripHistoryContainer.setVisibility(View.GONE);
+                    noTripsText.setVisibility(View.VISIBLE);
+                    return;
+                }
+
+                noTripsText.setVisibility(View.GONE);
+                tripHistoryContainer.setVisibility(View.VISIBLE);
+
+                for (DataSnapshot tripSnapshot : snapshot.getChildren()) {
+                    CommuterTrip trip = tripSnapshot.getValue(CommuterTrip.class);
+                    if (trip != null) {
+                        addTripItemView(trip);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Silently handle — trip history is non-critical
+            }
+        };
+
+        commuterTripsQuery.addValueEventListener(commuterTripsListener);
+    }
+
+    private void addTripItemView(CommuterTrip trip) {
+        View itemView = LayoutInflater.from(this)
+                .inflate(R.layout.item_commuter_trip, tripHistoryContainer, false);
+
+        TextView statusText = itemView.findViewById(R.id.tv_trip_status);
+        TextView fareText = itemView.findViewById(R.id.tv_trip_fare);
+        TextView distanceText = itemView.findViewById(R.id.tv_trip_distance);
+        TextView dateText = itemView.findViewById(R.id.tv_trip_date);
+
+        String status = trip.getStatus() != null ? trip.getStatus() : "UNKNOWN";
+        statusText.setText(status);
+
+        fareText.setText(String.format(Locale.getDefault(),
+                getString(R.string.trip_fare_format), trip.getFareAmount()));
+
+        distanceText.setText(String.format(Locale.getDefault(),
+                getString(R.string.trip_distance_format), trip.getDistanceKm()));
+
+        if (trip.getBoardingTimestampMs() > 0) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
+            dateText.setText(sdf.format(new Date(trip.getBoardingTimestampMs())));
+        }
+
+        tripHistoryContainer.addView(itemView);
     }
 
     @Override
@@ -341,5 +435,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         Intent loginIntent = new Intent(this, LoginActivity.class);
         FirebaseAuth.getInstance().signOut();
         loadLoginActivity();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (commuterTripsQuery != null && commuterTripsListener != null) {
+            commuterTripsQuery.removeEventListener(commuterTripsListener);
+        }
     }
 }

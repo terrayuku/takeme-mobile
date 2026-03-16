@@ -62,4 +62,10 @@
     <string name="randSign">R</string>
     <string name="emailVerification">Please verify your email address, and re-login</string>
 
+    <!-- Commuter trip history (req 6.3.2) -->
+    <string name="trip_history">Trip History</string>
+    <string name="no_trip_history">No trips yet</string>
+    <string name="trip_distance_format">%.1f km</string>
+    <string name="trip_fare_format">R%.2f</string>
+
 </resources>

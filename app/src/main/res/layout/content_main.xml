@@ -49,12 +49,21 @@
                 android:textAppearance="@style/TextAppearance.Takeme.Title" />
 
             <!-- From autocomplete -->
-            <fragment
-                android:id="@+id/from"
-                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/from_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_sm" />
+                android:layout_marginBottom="@dimen/spacing_sm"
+                android:hint="From...">
+
+                <AutoCompleteTextView
+                    android:id="@+id/from"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:completionThreshold="2" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Divider -->
             <View
@@ -65,15 +74,61 @@
                 android:background="@color/divider" />
 
             <!-- Destination autocomplete -->
-            <fragment
-                android:id="@+id/destination"
-                android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/destination_layout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_sm" />
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:hint="To...">
+
+                <AutoCompleteTextView
+                    android:id="@+id/destination"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:completionThreshold="2" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Trip history section (req 6.3.2) -->
+    <TextView
+        android:id="@+id/tv_trip_history_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:text="@string/trip_history"
+        android:textAppearance="@style/TextAppearance.Takeme.Title"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_card" />
+
+    <LinearLayout
+        android:id="@+id/trip_history_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_trip_history_label" />
+
+    <TextView
+        android:id="@+id/tv_no_trips"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:text="@string/no_trip_history"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Takeme.Caption"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_trip_history_label" />
 
     <!-- Find directions FAB -->
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
